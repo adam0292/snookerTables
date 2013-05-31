@@ -10,23 +10,26 @@ import java.text.NumberFormat;
 
 import javax.swing.*;
 
-public class Table extends JPanel implements ActionListener {
+public class Table extends JPanel implements ActionListener, MouseListener{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+	private TableOrder order;
 	private Timer stopWatch = new Timer(this);
-	private String tableTime = "0:0:0";
+	private String tableTime = "0:0:0", tableName;
 	private double price =0, priceConstant = 1 / 60.0 / 60.0;
 	private JLabel timerLabel, priceLabel;
 	private boolean running = false;
 	private JPanel center, controls;
 	private JButton start, priceButton;
 	private NumberFormat formatter;
-	public Table(String tableName) {
-
+	private Main main;
+	public Table(String tableName, Main main) {
+		this.main=main;
+		this.tableName=tableName;
+		order=new TableOrder(this);
 		this.setLayout(new BorderLayout());
 		this.setPreferredSize(new Dimension(250, 300));
 
@@ -48,7 +51,7 @@ public class Table extends JPanel implements ActionListener {
 		priceButton.setActionCommand("price");
 		JButton reset = new JButton("Reset");
 		reset.setActionCommand("reset");		
-		
+		this.addMouseListener(this);
 		controls.add(start);
 		// controls.add(stop);
 		controls.add(reset);
@@ -63,10 +66,16 @@ public class Table extends JPanel implements ActionListener {
 		center.add(priceLabel, BorderLayout.SOUTH);
 		this.add(center, BorderLayout.CENTER);
 
+//		JPanel bottomPanel = new JPanel();
 		this.add(priceButton, BorderLayout.SOUTH);
+//		bottomPanel.add(priceButton, BorderLayout.SOUTH);
 
+//		JButton orders = new JButton("Orders");
+//		orders.setActionCommand("orders");
+//		bottomPanel.add(orders);
+		
 		start.addActionListener(this);
-		// stop.addActionListener(this);
+//		orders.addActionListener(this);
 		priceButton.addActionListener(this);
 		reset.addActionListener(this);
 
@@ -74,6 +83,10 @@ public class Table extends JPanel implements ActionListener {
 
 	}
 
+	public TableOrder getOrder(){
+		return order;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("start".equals(e.getActionCommand()) && !running) {
@@ -129,6 +142,10 @@ public class Table extends JPanel implements ActionListener {
 		price = timeElapsed * priceConstant;
 		priceLabel.setText(formatter.format(price));
 	}
+	
+	public double getPrice(){
+		return price;
+	}
 
 	private void createTimer() {
 		new Thread(stopWatch).start();
@@ -136,6 +153,40 @@ public class Table extends JPanel implements ActionListener {
 
 	private void stopTimer() {
 		stopWatch.stop();
+	}
+	
+	public String getTableName(){
+		return tableName;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		main.toggleOrderVisibility(this);
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -61,6 +61,7 @@ public class Timer implements Runnable{
             catch (InterruptedException e ){}
             
             table.setTime(hr, min, (int)sec);
+            table.getOrder().updatePrice();
         }
     }
 
