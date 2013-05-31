@@ -22,7 +22,7 @@ public class Main extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private JPanel tables, container;
 	private JScrollPane scroller;
-	private int numberOfTables = 6;
+	private int numberOfTables = 0;
 	private ArrayList<Table> tableList;
 	public Main(){
 		tableList = new ArrayList<Table>();
@@ -48,7 +48,7 @@ public class Main extends JFrame implements ActionListener{
 //			Table table = new Table("Table "+i);
 //			tables.add(table);
 //		}
-		addTables();
+		addTables(6);
 		int numberPerRow = (this.getWidth()-100)/260;
 		Double number = (double)numberOfTables / (double)numberPerRow;
 		int numberPerColumn = (int)Math.ceil(number);
@@ -73,13 +73,27 @@ public class Main extends JFrame implements ActionListener{
 		
 	}
 	
-	public void addTables(){
-		tables.removeAll();
-		for(int i=1; i<=numberOfTables; i++){
-			Table table = new Table("Table "+i);
-			tables.add(table);
-			tableList.add(table);
+	public void addTables(int newTables){
+		if(newTables>numberOfTables){
+			for(int i=numberOfTables; i<newTables; i++){
+				Table table = new Table("Table "+(i+1));
+				tables.add(table);
+				tableList.add(table);
+			}
 		}
+		if(newTables<numberOfTables){
+			for (int i=numberOfTables; i>newTables; i--){
+				tables.remove(tableList.get(i-1));
+				tableList.remove(i-1);
+			}
+		}
+		numberOfTables=newTables;
+//		tables.removeAll();
+//		for(int i=1; i<=numberOfTables; i++){
+//			Table table = new Table("Table "+i);
+//			tables.add(table);
+//			tableList.add(table);
+//		}
 	}
 	
 	public void setAllPrices(double price){
@@ -93,8 +107,7 @@ public class Main extends JFrame implements ActionListener{
 	}
 	
 	public void newTables(int number){
-		numberOfTables=number;
-		addTables();
+		addTables(number);
 		resizeTables();
 	}
 	
