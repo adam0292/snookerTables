@@ -1,4 +1,4 @@
-package test;
+package snookerTables;
 
 public class Timer implements Runnable{
 
