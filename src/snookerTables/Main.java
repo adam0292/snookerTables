@@ -169,10 +169,10 @@ public class Main extends JFrame implements ActionListener{
 	}
 	
 	private void updateUI(){
-		SwingUtilities.updateComponentTreeUI(this);
-		SwingUtilities.updateComponentTreeUI(tables);
-			SwingUtilities.updateComponentTreeUI(scroller);
-			SwingUtilities.updateComponentTreeUI(container);
+		this.revalidate();
+		tables.revalidate();
+		scroller.revalidate();
+		container.revalidate();
 	}
 
 	

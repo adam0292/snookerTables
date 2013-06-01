@@ -92,7 +92,12 @@ public class Settings extends JFrame implements ActionListener{
 			boolean success=true;
 			if(!(tables.getText().equals(main.getNumberOfTables()))){
 				try{
-					main.newTables(Integer.parseInt(tables.getText()));
+					if(!(Integer.parseInt(tables.getText())<0)){
+						main.newTables(Integer.parseInt(tables.getText()));
+					}else{
+						JOptionPane.showMessageDialog(this, "Number of tables must be positive.");
+						success=false;
+					}
 				}catch(NumberFormatException ex){
 					success=false;
 					JOptionPane.showMessageDialog(this, "Number of tables must be an integer.");		
