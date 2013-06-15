@@ -22,7 +22,7 @@ public class Main extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private JPanel tables, container, central;
 	private JScrollPane scroller;
-	private JLabel subTitle, temp;
+	private JLabel subTitle;
 	private int numberOfTables = 0, active;
 	private ArrayList<Table> tableList;
 	private JButton tableReturn, settings;
@@ -190,6 +190,7 @@ public class Main extends JFrame implements ActionListener{
 	
 	public static void main(String[] args){
 		new Main();
+		new WaitingList();
 	}
 
 	private void turnActiveOff(){
