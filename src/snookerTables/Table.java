@@ -2,13 +2,17 @@ package snookerTables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.*;
 import java.text.NumberFormat;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 public class Table extends JPanel implements ActionListener, MouseListener{
 
@@ -31,13 +35,12 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		this.tableName=tableName;
 		order=new TableOrder(this);
 		this.setLayout(new BorderLayout());
-		this.setPreferredSize(new Dimension(250, 300));
+//		this.setPreferredSize(new Dimension(230, 200));
 
 		JLabel name = new JLabel(tableName, JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 15));
-		name.setPreferredSize(new Dimension(0, 25));
+//		name.setPreferredSize(new Dimension(0, 25));
 		this.add(name, BorderLayout.NORTH);
-
 		formatter = NumberFormat.getCurrencyInstance();
 		
 		controls = new JPanel(new FlowLayout());

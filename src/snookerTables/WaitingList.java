@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class WaitingList extends JFrame implements ActionListener {
+public class WaitingList extends JPanel implements ActionListener {
 
 	/**
 	 * 
@@ -22,8 +22,7 @@ public class WaitingList extends JFrame implements ActionListener {
 	private int selected=-1;
 	
 	public WaitingList(){
-		this.setVisible(true);
-		this.setSize(200, 200);
+//		this.setPreferredSize(new Dimension(200, 200));
 		
 		this.setLayout(new BorderLayout());
 		
@@ -53,16 +52,24 @@ public class WaitingList extends JFrame implements ActionListener {
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		list.setVisibleRowCount(-1);
 		
-		JButton remove = new JButton("Remove");
-		remove.setActionCommand("remove");
-		remove.addActionListener(this);
-		JPanel bottomPanel = new JPanel(new BorderLayout());
-		bottomPanel.add(remove, BorderLayout.EAST);
+		JPanel bottomPanel = new JPanel();
 		
 		JButton add = new JButton("Add");
 		add.setActionCommand("add");
 		add.addActionListener(this);
-		bottomPanel.add(add, BorderLayout.WEST);
+		bottomPanel.add(add);
+		
+		JButton remove = new JButton("Remove");
+		remove.setActionCommand("remove");
+		remove.addActionListener(this);
+		bottomPanel.add(remove);
+		
+		
+		
+//		JButton hide = new JButton("Hide");
+//		hide.setActionCommand("hide");
+//		hide.addActionListener(this);
+//		bottomPanel.add(hide, BorderLayout.EAST);
 		
 		this.add(bottomPanel, BorderLayout.SOUTH);
 		
@@ -70,8 +77,6 @@ public class WaitingList extends JFrame implements ActionListener {
 		listScroller.setPreferredSize(new Dimension(250, 80));
 		this.add(listScroller, BorderLayout.CENTER);
 
-		addName("Test");
-		addName("Test2");
 	}
 	
 	public void addName(String name){
@@ -109,6 +114,10 @@ public class WaitingList extends JFrame implements ActionListener {
 				addName(toAdd);
 			}
 		}
+//		}else if("hide".equals(e.getActionCommand())){
+//			this.setVisible(false);
+//		}
+		
 		
 	}
 	
