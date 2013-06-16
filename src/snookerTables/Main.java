@@ -2,16 +2,17 @@ package snookerTables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.swing.*;
 
@@ -21,14 +22,15 @@ public class Main extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel tables, container, central, waitingList, bottomBar;
+	private JPanel tables, container, central, waitingList, bottomBar, rightCenter, detailPanel;
 //	private JScrollPane scroller;
 	private JLabel subTitle, clock;
-	private int numberOfTables = 0, active;
+	private int numberOfTables = 0, active, detailShow;
 	private ArrayList<Table> tableList;
 	private JButton tableReturn, settings;
 	private Table showingOrder;
 	private Color color;
+	GridLayout detailGridLay;
 
 	public Main() {
 		tableList = new ArrayList<Table>();
@@ -48,8 +50,9 @@ public class Main extends JFrame implements ActionListener {
 		
 		JPanel topBar = new JPanel(new BorderLayout());
 		topBar.setBackground(color);
-		JLabel name = new JLabel("Snooker Master", JLabel.CENTER);
+		JLabel name = new JLabel("Table Master", JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 30));
+		name.setForeground(Color.YELLOW);
 		topBar.add(name, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		container.add(topBar, BorderLayout.NORTH);
@@ -60,6 +63,8 @@ public class Main extends JFrame implements ActionListener {
 		Timer clockTime = new Timer(this);
 		clock = new JLabel();
 		new Thread(clockTime).start();
+		clock.setForeground(Color.BLUE);
+		clock.setFont(new Font(null, Font.PLAIN, 15));
 		topBar.add(clockBar, BorderLayout.SOUTH);
 		clockBar.add(clock, BorderLayout.WEST);
 		
@@ -83,21 +88,22 @@ public class Main extends JFrame implements ActionListener {
 		// tables.add(table);
 		// }
 		addTables(9);
-		int numberPerRow = (this.getWidth() - 100) / 260;
-		Double number = (double) numberOfTables / (double) numberPerRow;
-		int numberPerColumn = (int) Math.ceil(number);
+//		int numberPerRow = (this.getWidth() - 100) / 260;
+//		Double number = (double) numberOfTables / (double) numberPerRow;
+//		int numberPerColumn = (int) Math.ceil(number);
 //		scroller.setPreferredSize(new Dimension(this.getWidth() - 40, this
 //				.getHeight() - 120));
 //		tables.setPreferredSize(new Dimension(this.getWidth() - 100,
 //				numberPerColumn * 310));
 
-		waitingList = new WaitingList();
-		central.add(waitingList, BorderLayout.EAST);
-		waitingList.setVisible(false);
+		rightCenter = new JPanel();
+		rightCenter.setBackground(color);
+		container.add(rightCenter, BorderLayout.EAST);
+		   
 
 		bottomBar = new JPanel();
 		bottomBar.setBackground(color);
-		container.add(bottomBar, BorderLayout.SOUTH);
+		central.add(bottomBar, BorderLayout.SOUTH);
 		settings = new JButton("Settings");
 		settings.setActionCommand("settings");
 		settings.addActionListener(this);
@@ -107,7 +113,17 @@ public class Main extends JFrame implements ActionListener {
 		showWaiting.setActionCommand("waiting");
 		showWaiting.addActionListener(this);
 		bottomBar.add(showWaiting);
-
+		
+		detailGridLay = new GridLayout(0, 1);
+		detailPanel = new JPanel(detailGridLay);
+		detailPanel.setBackground(color);
+		rightCenter.add(detailPanel);
+		
+		waitingList = new WaitingList();
+		
+		rightCenter.add(waitingList);
+		waitingList.setVisible(false);
+		
 		tableReturn = new JButton("Tables");
 		tableReturn.setActionCommand("table");
 		tableReturn.addActionListener(this);
@@ -118,7 +134,7 @@ public class Main extends JFrame implements ActionListener {
 
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent comp) {
-//				resizeTables();
+				resizeTables();
 			}
 		});
 		
@@ -127,9 +143,10 @@ public class Main extends JFrame implements ActionListener {
 
 	}
 	
-	public void setClock(int hour, int min, int sec) {
-		String tableTime = hour + ":" + min + ":" + sec;
-		clock.setText(tableTime);
+	public void setClock() {
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+		Calendar cal = Calendar.getInstance();
+		clock.setText(dateFormat.format(cal.getTime()));
 	}
 
 	public void toggleTablesVisibility() {
@@ -150,8 +167,31 @@ public class Main extends JFrame implements ActionListener {
 	}
 
 	public void toggleOrderVisibility(Table table) {
-		showingOrder = table;
-		showingOrder.getOrder().toggleVisible();
+//		showingOrder = table;
+//		showingOrder.getOrder().toggleVisible();
+		if(table.getOrder().isShown()){
+			detailPanel.remove(table.getOrder());
+			table.getOrder().setShown(false);
+			detailShow--;
+			if(detailShow<=3&&detailShow>0){
+				detailGridLay.setColumns(detailShow);
+				}else if(detailShow==0){
+					detailGridLay.setColumns(1);
+				}else{
+					detailGridLay.setColumns(3);
+				}
+		}else{
+			detailShow++;
+			if(detailShow<=3){
+			detailGridLay.setColumns(detailShow);
+			}else{
+				detailGridLay.setColumns(3);
+			}
+		detailPanel.add(table.getOrder(), BorderLayout.WEST);
+		table.getOrder().setShown(true);
+		
+		}
+		resizeTables();
 		// if(active!=1){
 		// turnActiveOff();
 		// central.add(table.getOrder(), BorderLayout.CENTER);
@@ -171,7 +211,7 @@ public class Main extends JFrame implements ActionListener {
 		// }
 
 	}
-
+	
 	public void addTables(int newTables) {
 		
 //		for(int i=0; i<newTables; i++){
@@ -251,14 +291,14 @@ public class Main extends JFrame implements ActionListener {
 		new Main();
 	}
 
-	private void turnActiveOff() {
-		if (active == 0) {
-			toggleTablesVisibility();
-		}
-		if (active == 1) {
-			toggleOrderVisibility(tableList.get(0));
-		}
-	}
+//	private void turnActiveOff() {
+//		if (active == 0) {
+//			toggleTablesVisibility();
+//		}
+//		if (active == 1) {
+//			toggleOrderVisibility(tableList.get(0));
+//		}
+//	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

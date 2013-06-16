@@ -29,14 +29,6 @@ public class Timer implements Runnable{
 	public Timer(Main main){
 		this.main=main;
 		clock =true;
-			Date date = new Date();
-			Calendar calendar = GregorianCalendar.getInstance();
-			calendar.setTime(date);
-			hr = calendar.get(Calendar.HOUR_OF_DAY);
-			min = calendar.get(Calendar.MINUTE);
-			sec = calendar.get(Calendar.SECOND);
-			hr=23;
-			min=59;
 	}
 
     public int getHr() {
@@ -85,18 +77,13 @@ public class Timer implements Runnable{
                 hr++;
                 min=0;
             }
-            if(clock){
-            	if(hr==24){
-            		hr=0;
-            	}
-            }
             try { Thread.sleep(10); }
             catch (InterruptedException e ){}
             if(!clock){
             table.setTime(hr, min, (int)sec);
             table.getOrder().updatePrice();
             }else{
-            	main.setClock(hr,  min, (int)sec);
+            	main.setClock();
             }
         }
     }

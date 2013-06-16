@@ -18,7 +18,7 @@ public class WaitingList extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private ArrayList<String> waiting;
-	private JList list;
+	private JList<String> list;
 	private int selected=-1;
 	
 	public WaitingList(){
@@ -28,7 +28,7 @@ public class WaitingList extends JPanel implements ActionListener {
 		
 		waiting = new ArrayList<String>();
 		
-		list = new JList(waiting.toArray());
+		list = new JList<String>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		ListSelectionModel selectionModel = list.getSelectionModel();
 		selectionModel.addListSelectionListener(new ListSelectionListener() {
@@ -81,7 +81,7 @@ public class WaitingList extends JPanel implements ActionListener {
 	
 	public void addName(String name){
 			waiting.add(name);
-			DefaultListModel listModel = new DefaultListModel();
+			DefaultListModel<String> listModel = new DefaultListModel<String>();
 			for(int i=0; i<waiting.size(); i++){
 				listModel.addElement(waiting.get(i));
 			}
@@ -94,7 +94,7 @@ public class WaitingList extends JPanel implements ActionListener {
 		}else{
 		waiting.remove(toRemove);
 		
-		DefaultListModel listModel = new DefaultListModel();
+		DefaultListModel<String> listModel = new DefaultListModel<String>();
 		for(int i=0; i<waiting.size(); i++){
 			listModel.addElement(waiting.get(i));
 		}

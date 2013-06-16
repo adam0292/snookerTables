@@ -2,17 +2,12 @@ package snookerTables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.event.*;
 import java.text.NumberFormat;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 
 public class Table extends JPanel implements ActionListener, MouseListener{
 
@@ -23,7 +18,7 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 	private TableOrder order;
 	private Timer stopWatch = new Timer(this);
 	private String tableTime = "0:0:0", tableName;
-	private double price =0, priceConstant = 1 / 60.0 / 60.0;
+	private double price =0.00, priceConstant = 1 / 60.0 / 60.0;
 	private JLabel timerLabel, priceLabel;
 	private boolean running = false;
 	private JPanel center, controls;
@@ -58,7 +53,11 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		controls.add(start);
 		// controls.add(stop);
 		controls.add(reset);
-
+		JButton detail = new JButton("Details");
+		detail.setActionCommand("detail");
+		controls.add(detail);
+		detail.addActionListener(this);
+		
 		center = new JPanel(new BorderLayout());
 		center.add(controls, BorderLayout.NORTH);
 		timerLabel = new JLabel(tableTime, JLabel.CENTER);
@@ -114,19 +113,27 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 				JOptionPane.showMessageDialog(this, "Number required");
 			}
 		} else if ("reset".equals(e.getActionCommand())) {
-			if (running == true) {
-				stopTimer();
-				running = false;
+			if(JOptionPane.showConfirmDialog(this, "Reset "+getTableName()+"?","Confirm",JOptionPane.YES_NO_OPTION)==0){
+				if (running == true) {
+					stopTimer();
+					running = false;
+				}
+				setTime(0, 0, 0);
+				stopWatch.reset();
+				changeBackground(new Color(220, 20, 60));
+				start.setText("Start");
+				start.setActionCommand("start");
 			}
-			setTime(0, 0, 0);
-			stopWatch.reset();
-			changeBackground(new Color(220, 20, 60));
-			start.setText("Start");
-			start.setActionCommand("start");
+		}else if("detail".equals(e.getActionCommand())){
+			main.toggleOrderVisibility(this);
 		}
 
 	}
 
+	public Main getMain(){
+		return main;
+	}
+	
 	private void changeBackground(Color newColor) {
 		this.setBackground(newColor);
 		center.setBackground(newColor);
@@ -164,7 +171,7 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		main.toggleOrderVisibility(this);
+//		main.toggleOrderVisibility(this);
 		
 	}
 
