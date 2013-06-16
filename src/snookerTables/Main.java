@@ -23,7 +23,7 @@ public class Main extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel tables, container, central, waitingList, bottomBar;
 //	private JScrollPane scroller;
-	private JLabel subTitle;
+	private JLabel subTitle, clock;
 	private int numberOfTables = 0, active;
 	private ArrayList<Table> tableList;
 	private JButton tableReturn, settings;
@@ -46,15 +46,22 @@ public class Main extends JFrame implements ActionListener {
 //		Dimension dimension = toolkit.getScreenSize();
 //		this.setSize(dimension);
 		
-		JPanel topBar = new JPanel();
+		JPanel topBar = new JPanel(new BorderLayout());
 		topBar.setBackground(color);
-		JLabel name = new JLabel("Snooker Master");
+		JLabel name = new JLabel("Snooker Master", JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 30));
-		topBar.add(name);
+		topBar.add(name, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		container.add(topBar, BorderLayout.NORTH);
 //		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
 //				.getHeight() - 140));
+		JPanel clockBar = new JPanel(new BorderLayout());
+		clockBar.setBackground(color);
+		Timer clockTime = new Timer(this);
+		clock = new JLabel();
+		new Thread(clockTime).start();
+		topBar.add(clockBar, BorderLayout.SOUTH);
+		clockBar.add(clock, BorderLayout.WEST);
 		
 		tables = new JPanel(new GridLayout(0,3, 2, 2));
 		central = new JPanel(new BorderLayout());
@@ -118,6 +125,11 @@ public class Main extends JFrame implements ActionListener {
 //		container.setPreferredSize(new Dimension(200,200));
 //		pack();
 
+	}
+	
+	public void setClock(int hour, int min, int sec) {
+		String tableTime = hour + ":" + min + ":" + sec;
+		clock.setText(tableTime);
 	}
 
 	public void toggleTablesVisibility() {
