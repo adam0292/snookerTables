@@ -44,9 +44,9 @@ public class Settings extends JFrame implements ActionListener{
 //		JPanel tableSetts  = new JPanel();
 //		centerBox.add(tableSetts);
 		JLabel numOfTables = new JLabel("Number of Tables: ");
-		centerBox.add(numOfTables);
+//		centerBox.add(numOfTables);
 		tables = new JTextField(""+main.getNumberOfTables(), 4);
-		centerBox.add(tables);
+//		centerBox.add(tables);
 //		JPanel priceSetts = new JPanel();
 //		centerBox.add(priceSetts);
 		JLabel pricePH = new JLabel("Adjust all price per hours: ");

@@ -2,9 +2,11 @@ package snookerTables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -23,30 +25,31 @@ public class Main extends JFrame implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel tables, container, central, waitingList, bottomBar, rightCenter, detailPanel;
-//	private JScrollPane scroller;
+	private JScrollPane scroll;
 	private JLabel subTitle, clock;
 	private int numberOfTables = 0, active, detailShow;
 	private ArrayList<Table> tableList;
 	private JButton tableReturn, settings;
 	private Table showingOrder;
 	private Color color;
-	GridLayout detailGridLay;
+	private GridLayout detailGridLay;
+	private final int DETAILWIDTH=3;
 
 	public Main() {
 		tableList = new ArrayList<Table>();
 		container = new JPanel(new BorderLayout());
-		add(container);
+//		add(container);
 		color = new Color(56, 142, 142);
 		this.setVisible(true);
 //		this.setSize(900, 700);
-		this.setLayout(new FlowLayout());
+		this.setLayout(new BorderLayout());
 		this.getContentPane().setBackground(color);
 		
 		
-//		this.setState(JFrame.NORMAL);
-//		Toolkit toolkit = Toolkit.getDefaultToolkit();
-//		Dimension dimension = toolkit.getScreenSize();
-//		this.setSize(dimension);
+		this.setState(JFrame.NORMAL);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dimension = toolkit.getScreenSize();
+		this.setSize(dimension);
 		
 		JPanel topBar = new JPanel(new BorderLayout());
 		topBar.setBackground(color);
@@ -55,7 +58,7 @@ public class Main extends JFrame implements ActionListener {
 		name.setForeground(Color.YELLOW);
 		topBar.add(name, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		container.add(topBar, BorderLayout.NORTH);
+		this.add(topBar, BorderLayout.NORTH);
 //		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
 //				.getHeight() - 140));
 		JPanel clockBar = new JPanel(new BorderLayout());
@@ -63,25 +66,35 @@ public class Main extends JFrame implements ActionListener {
 		Timer clockTime = new Timer(this);
 		clock = new JLabel();
 		new Thread(clockTime).start();
-		clock.setForeground(Color.BLUE);
-		clock.setFont(new Font(null, Font.PLAIN, 15));
+		clock.setForeground(Color.YELLOW);
+		clock.setFont(new Font(null, Font.PLAIN, 20));
 		topBar.add(clockBar, BorderLayout.SOUTH);
 		clockBar.add(clock, BorderLayout.WEST);
-		
-		tables = new JPanel(new GridLayout(0,3, 2, 2));
+		scroll=new JScrollPane(container);
+//		container.setPreferredSize(new Dimension(300,300));
+		this.add(scroll, BorderLayout.CENTER);
+//		scroll = new JScrollPane();
+//		scroll.getViewport().add(central);
+//		container.add(scroll, BorderLayout.CENTER);
+//		this.add(container);
+		tables = new JPanel(new GridLayout(0,3, 4, 4));
+//		tables = new JPanel(new FlowLayout());
+//		tables.setPreferredSize(new Dimension(100,100));
+//		tables.setSize(200, 200);
+
 		central = new JPanel(new BorderLayout());
 //		central.setPreferredSize(new Dimension(container.getWidth() - 10,
 //				container.getHeight() - 10));
+		container.add(central, BorderLayout.CENTER);
 		central.setBackground(color);
-		subTitle = new JLabel("Tables", JLabel.CENTER);
-		subTitle.setFont(new Font(null, Font.BOLD, 20));
-		central.add(subTitle, BorderLayout.NORTH);
+//		subTitle = new JLabel("Tables", JLabel.CENTER);
+//		subTitle.setFont(new Font(null, Font.BOLD, 20));
+//		central.add(subTitle, BorderLayout.NORTH);
 //		scroller = new JScrollPane(tables);
 //		central.add(scroller, BorderLayout.CENTER);
 		
 		central.add(tables, BorderLayout.CENTER);
 		
-		container.add(central, BorderLayout.CENTER);
 		tables.setBackground(color);
 		// for(int i=1; i<=numberOfTables; i++){
 		// Table table = new Table("Table "+i);
@@ -114,7 +127,7 @@ public class Main extends JFrame implements ActionListener {
 		showWaiting.addActionListener(this);
 		bottomBar.add(showWaiting);
 		
-		detailGridLay = new GridLayout(0, 1);
+		detailGridLay = new GridLayout(0, 1, 4, 4);
 		detailPanel = new JPanel(detailGridLay);
 		detailPanel.setBackground(color);
 		rightCenter.add(detailPanel);
@@ -129,9 +142,10 @@ public class Main extends JFrame implements ActionListener {
 		tableReturn.addActionListener(this);
 		tableReturn.setVisible(false);
 		bottomBar.add(tableReturn);
-		resizeTables();
-//		updateUI();
-
+		
+		updateUI();
+		pack();
+		
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent comp) {
 				resizeTables();
@@ -173,19 +187,19 @@ public class Main extends JFrame implements ActionListener {
 			detailPanel.remove(table.getOrder());
 			table.getOrder().setShown(false);
 			detailShow--;
-			if(detailShow<=3&&detailShow>0){
+			if(detailShow<=DETAILWIDTH&&detailShow>0){
 				detailGridLay.setColumns(detailShow);
 				}else if(detailShow==0){
 					detailGridLay.setColumns(1);
 				}else{
-					detailGridLay.setColumns(3);
+					detailGridLay.setColumns(DETAILWIDTH);
 				}
 		}else{
 			detailShow++;
-			if(detailShow<=3){
+			if(detailShow<=DETAILWIDTH){
 			detailGridLay.setColumns(detailShow);
 			}else{
-				detailGridLay.setColumns(3);
+				detailGridLay.setColumns(DETAILWIDTH);
 			}
 		detailPanel.add(table.getOrder(), BorderLayout.WEST);
 		table.getOrder().setShown(true);
@@ -258,10 +272,12 @@ public class Main extends JFrame implements ActionListener {
 
 	private void updateUI() {
 		this.validate();
+		detailPanel.validate();
 		tables.validate();
-//		scroller.revalidate();
 		central.validate();
 		container.validate();
+		scroll.validate();
+		
 	}
 
 	public void resizeTables() {
@@ -283,8 +299,9 @@ public class Main extends JFrame implements ActionListener {
 //		container.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()-40));
 //
 //		central.setPreferredSize(central.getPreferredSize());
-		pack();
+//		pack();
 		updateUI();
+//		pack();
 	}
 
 	public static void main(String[] args) {
@@ -309,10 +326,10 @@ public class Main extends JFrame implements ActionListener {
 		} else if ("waiting".equals(e.getActionCommand())) {
 			if (waitingList.isVisible()) {
 				waitingList.setVisible(false);
-				pack();
+				resizeTables();
 			} else {
 				waitingList.setVisible(true);
-				pack();
+				resizeTables();
 			}
 		}
 

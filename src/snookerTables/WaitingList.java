@@ -25,7 +25,7 @@ public class WaitingList extends JPanel implements ActionListener {
 //		this.setPreferredSize(new Dimension(200, 200));
 		
 		this.setLayout(new BorderLayout());
-		
+		setPreferredSize(new Dimension(170,300));
 		waiting = new ArrayList<String>();
 		
 		list = new JList<String>();
@@ -80,7 +80,7 @@ public class WaitingList extends JPanel implements ActionListener {
 	}
 	
 	public void addName(String name){
-			waiting.add(name);
+			waiting.add(waiting.size()+1+" - "+name);
 			DefaultListModel<String> listModel = new DefaultListModel<String>();
 			for(int i=0; i<waiting.size(); i++){
 				listModel.addElement(waiting.get(i));
@@ -93,6 +93,11 @@ public class WaitingList extends JPanel implements ActionListener {
 		if(waiting.size()<=toRemove || toRemove==-1){
 		}else{
 		waiting.remove(toRemove);
+		for(int i=0; i<waiting.size(); i++){
+			String selected = waiting.get(i);
+			String[] split = selected.split("-", 2);
+			waiting.set(i, i+1+" -"+split[1]);
+		}
 		
 		DefaultListModel<String> listModel = new DefaultListModel<String>();
 		for(int i=0; i<waiting.size(); i++){

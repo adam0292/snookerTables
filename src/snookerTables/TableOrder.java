@@ -33,7 +33,7 @@ public class TableOrder extends JPanel implements ActionListener{
 		name.setFont(new Font(null, Font.BOLD, 20));
 		container.add(name, BorderLayout.NORTH);
 		
-		timePrice=new JLabel("Current Table Hire Cost: £0.00");
+		timePrice=new JLabel("Hire Cost: Â£0.00");
 //		timePrice.setFont(new Font(null, Font.BOLD, 10));
 		container.add(timePrice, BorderLayout.CENTER);
 		
@@ -54,7 +54,7 @@ public class TableOrder extends JPanel implements ActionListener{
 	
 	public void updatePrice(){
 		double price = table.getPrice();
-		timePrice.setText("Current Table Hire Cost: "+formatter.format(price));
+		timePrice.setText("Hire Cost: "+formatter.format(price));
 		
 		
 	}

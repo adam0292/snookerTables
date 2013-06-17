@@ -2,6 +2,7 @@ package snookerTables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.*;
@@ -21,7 +22,7 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 	private double price =0.00, priceConstant = 1 / 60.0 / 60.0;
 	private JLabel timerLabel, priceLabel;
 	private boolean running = false;
-	private JPanel center, controls;
+	private JPanel center, controls, bottomBar, center2;
 	private JButton start, priceButton;
 	private NumberFormat formatter;
 	private Main main;
@@ -30,8 +31,10 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		this.tableName=tableName;
 		order=new TableOrder(this);
 		this.setLayout(new BorderLayout());
-//		this.setPreferredSize(new Dimension(230, 200));
+//		this.setPreferredSize(new Dimension(230,200));
 
+//		setMaximumSize(new Dimension(100,100));
+		
 		JLabel name = new JLabel(tableName, JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 15));
 //		name.setPreferredSize(new Dimension(0, 25));
@@ -44,7 +47,7 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		start.setActionCommand("start");
 		// JButton stop = new JButton("Stop");
 		// stop.setActionCommand("stop");
-		priceButton = new JButton("Price per Hour: "
+		priceButton = new JButton("PPH: "
 				+ formatter.format((priceConstant * 60 * 60.0)));
 		priceButton.setActionCommand("price");
 		JButton reset = new JButton("Reset");
@@ -53,25 +56,33 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		controls.add(start);
 		// controls.add(stop);
 		controls.add(reset);
-		JButton detail = new JButton("Details");
-		detail.setActionCommand("detail");
-		controls.add(detail);
-		detail.addActionListener(this);
+		
 		
 		center = new JPanel(new BorderLayout());
 		center.add(controls, BorderLayout.NORTH);
+		
+		bottomBar = new JPanel();
+		this.add(bottomBar, BorderLayout.SOUTH);
+		
+		
 		timerLabel = new JLabel(tableTime, JLabel.CENTER);
 		timerLabel.setFont(new Font(null, Font.PLAIN, 40));
 		priceLabel = new JLabel(formatter.format(price), JLabel.CENTER);
 		priceLabel.setFont(new Font(null, Font.PLAIN, 20));
-		center.add(timerLabel, BorderLayout.CENTER);
-		center.add(priceLabel, BorderLayout.SOUTH);
+		center2 = new JPanel(new BorderLayout());
+		center2.add(timerLabel, BorderLayout.CENTER);
+		center2.add(priceLabel, BorderLayout.SOUTH);
 		this.add(center, BorderLayout.CENTER);
-
+		center.add(center2, BorderLayout.CENTER);
+		
 //		JPanel bottomPanel = new JPanel();
-		this.add(priceButton, BorderLayout.SOUTH);
+		bottomBar.add(priceButton, BorderLayout.SOUTH);
 //		bottomPanel.add(priceButton, BorderLayout.SOUTH);
 
+		JButton detail = new JButton("Details");
+		detail.setActionCommand("detail");
+		bottomBar.add(detail);
+		detail.addActionListener(this);
 //		JButton orders = new JButton("Orders");
 //		orders.setActionCommand("orders");
 //		bottomPanel.add(orders);
@@ -127,6 +138,7 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		}else if("detail".equals(e.getActionCommand())){
 			main.toggleOrderVisibility(this);
 		}
+		main.resizeTables();
 
 	}
 
@@ -138,11 +150,14 @@ public class Table extends JPanel implements ActionListener, MouseListener{
 		this.setBackground(newColor);
 		center.setBackground(newColor);
 		controls.setBackground(newColor);
+		center2.setBackground(newColor);
+		bottomBar.setBackground(newColor);
+		
 	}
 
 	public void setPriceConstant(double perHour) {
 		priceConstant = perHour / 3600.0;
-		priceButton.setText("Price per Hour: " + formatter.format(perHour));
+		priceButton.setText("PPH: " + formatter.format(perHour));
 	}
 
 	public void setTime(int hour, int min, int sec) {
