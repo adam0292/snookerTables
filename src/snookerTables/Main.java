@@ -46,30 +46,47 @@ public class Main extends JFrame implements ActionListener {
 		this.getContentPane().setBackground(color);
 		
 		
-		this.setState(JFrame.NORMAL);
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension dimension = toolkit.getScreenSize();
-		this.setSize(dimension);
+		try{ 
+//			   UIManager.setLookAndFeel(
+//			        UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			}
+			catch(Exception e){
+			 e.printStackTrace();
+			}
 		
+		JPanel topPanel = new JPanel(new BorderLayout());
+		JMenuBar menu = new JMenuBar();
+		JMenu file = new JMenu("File");
+		
+		JMenuItem settingsMenu = new JMenuItem("Settings");
+		settingsMenu.setActionCommand("settings");
+		settingsMenu.addActionListener(this);
+		file.add(settingsMenu);
+		JMenuItem waitingListMenu = new JMenuItem("Waiting List");
+		waitingListMenu.setActionCommand("waiting");
+		waitingListMenu.addActionListener(this);
+		file.add(waitingListMenu);
+		
+		menu.add(file);
+		topPanel.add(menu, BorderLayout.NORTH);
 		JPanel topBar = new JPanel(new BorderLayout());
+		topPanel.add(topBar, BorderLayout.CENTER);
 		topBar.setBackground(color);
-		JLabel name = new JLabel("Table Master", JLabel.CENTER);
+		JLabel name = new JLabel("Snooker Club", JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 30));
 		name.setForeground(Color.YELLOW);
 		topBar.add(name, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.add(topBar, BorderLayout.NORTH);
+		this.add(topPanel, BorderLayout.NORTH);
 //		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
 //				.getHeight() - 140));
-		JPanel clockBar = new JPanel(new BorderLayout());
-		clockBar.setBackground(color);
 		Timer clockTime = new Timer(this);
-		clock = new JLabel();
+		clock = new JLabel("", JLabel.CENTER);
 		new Thread(clockTime).start();
 		clock.setForeground(Color.YELLOW);
 		clock.setFont(new Font(null, Font.PLAIN, 20));
-		topBar.add(clockBar, BorderLayout.SOUTH);
-		clockBar.add(clock, BorderLayout.WEST);
+		topBar.add(clock, BorderLayout.SOUTH);
 		scroll=new JScrollPane(container);
 //		container.setPreferredSize(new Dimension(300,300));
 		this.add(scroll, BorderLayout.CENTER);
@@ -77,12 +94,21 @@ public class Main extends JFrame implements ActionListener {
 //		scroll.getViewport().add(central);
 //		container.add(scroll, BorderLayout.CENTER);
 //		this.add(container);
-		tables = new JPanel(new GridLayout(0,3, 4, 4));
+		tables = new JPanel(new FlowLayout());
+		tables.setPreferredSize(new Dimension(680,660));
+//		tables.setMaximumSize(new Dimension(200,200));
+//		.setPreferredSize(nze(new Dimension(200,200));
+//		tables.setR
 //		tables = new JPanel(new FlowLayout());
 //		tables.setPreferredSize(new Dimension(100,100));
 //		tables.setSize(200, 200);
 
-		central = new JPanel(new BorderLayout());
+		central = new JPanel();
+		
+		container.setBackground(color);
+		scroll.setBackground(color);
+		
+		
 //		central.setPreferredSize(new Dimension(container.getWidth() - 10,
 //				container.getHeight() - 10));
 		container.add(central, BorderLayout.CENTER);
@@ -93,14 +119,14 @@ public class Main extends JFrame implements ActionListener {
 //		scroller = new JScrollPane(tables);
 //		central.add(scroller, BorderLayout.CENTER);
 		
-		central.add(tables, BorderLayout.CENTER);
+		central.add(tables);
 		
 		tables.setBackground(color);
 		// for(int i=1; i<=numberOfTables; i++){
 		// Table table = new Table("Table "+i);
 		// tables.add(table);
 		// }
-		addTables(9);
+		
 //		int numberPerRow = (this.getWidth() - 100) / 260;
 //		Double number = (double) numberOfTables / (double) numberPerRow;
 //		int numberPerColumn = (int) Math.ceil(number);
@@ -116,7 +142,7 @@ public class Main extends JFrame implements ActionListener {
 
 		bottomBar = new JPanel();
 		bottomBar.setBackground(color);
-		central.add(bottomBar, BorderLayout.SOUTH);
+//		central.add(bottomBar, BorderLayout.SOUTH);
 		settings = new JButton("Settings");
 		settings.setActionCommand("settings");
 		settings.addActionListener(this);
@@ -143,8 +169,15 @@ public class Main extends JFrame implements ActionListener {
 		tableReturn.setVisible(false);
 		bottomBar.add(tableReturn);
 		
+		addTables(9);
+		
 		updateUI();
 		pack();
+		
+//		this.setState(JFrame.NORMAL);
+//		Toolkit toolkit = Toolkit.getDefaultToolkit();
+//		Dimension dimension = toolkit.getScreenSize();
+//		this.setSize(dimension);
 		
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent comp) {

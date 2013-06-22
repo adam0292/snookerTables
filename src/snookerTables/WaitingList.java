@@ -20,6 +20,7 @@ public class WaitingList extends JPanel implements ActionListener {
 	private ArrayList<String> waiting;
 	private JList<String> list;
 	private int selected=-1;
+	private Table table;
 	
 	public WaitingList(){
 //		this.setPreferredSize(new Dimension(200, 200));
@@ -52,24 +53,27 @@ public class WaitingList extends JPanel implements ActionListener {
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		list.setVisibleRowCount(-1);
 		
-		JPanel bottomPanel = new JPanel();
+		JPanel bottomPanel = new JPanel(new BorderLayout());
 		
+		JPanel topBottom = new JPanel();
+		bottomPanel.add(topBottom,BorderLayout.CENTER);
 		JButton add = new JButton("Add");
 		add.setActionCommand("add");
 		add.addActionListener(this);
-		bottomPanel.add(add);
+		topBottom.add(add);
 		
 		JButton remove = new JButton("Remove");
 		remove.setActionCommand("remove");
 		remove.addActionListener(this);
-		bottomPanel.add(remove);
+		topBottom.add(remove);
 		
 		
-		
-//		JButton hide = new JButton("Hide");
-//		hide.setActionCommand("hide");
-//		hide.addActionListener(this);
-//		bottomPanel.add(hide, BorderLayout.EAST);
+		JPanel bottomBottom = new JPanel();
+		bottomPanel.add(bottomBottom,BorderLayout.SOUTH);
+		JButton hide = new JButton("Hide");
+		hide.setActionCommand("hide");
+		hide.addActionListener(this);
+		bottomBottom.add(hide);
 		
 		this.add(bottomPanel, BorderLayout.SOUTH);
 		
@@ -118,10 +122,10 @@ public class WaitingList extends JPanel implements ActionListener {
 			if(!(toAdd==null)){
 				addName(toAdd);
 			}
+		}else if("hide".equals(e.getActionCommand())){
+			this.setVisible(false);
+			
 		}
-//		}else if("hide".equals(e.getActionCommand())){
-//			this.setVisible(false);
-//		}
 		
 		
 	}
