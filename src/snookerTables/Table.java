@@ -9,8 +9,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.text.NumberFormat;
+import java.util.Properties;
 
 import javax.swing.*;
 
@@ -23,9 +25,9 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private TableOrder order;
 	private Timer stopWatch = new Timer(this);
 	private String tableTime = "0:0:0", tableName;
-	private double hirePrice = 0.00, priceConstant = 1 / 60.0 / 60.0,
-			drinkPrice, foodPrice, extraPrice, totalPrice;
-	private JLabel timerLabel, priceLabel;
+	private double hirePrice = 0.00, priceConstant,
+			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice;
+	private JLabel timerLabel, priceLabel, currentPrice;
 	private boolean running = false;
 	private JPanel center, controls, bottomBar, center2, topBottom,
 			bottomBottom, container;
@@ -33,37 +35,47 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private NumberFormat formatter;
 	private Main main;
 	private int timeElapsed;
-	
-	 /** Stroke size. it is recommended to set it to 1 for better view */
-    protected int strokeSize = 1;
-    /** Color of shadow */
-    protected Color shadowColor = Color.black;
-    /** Sets if it drops shadow */
-    protected boolean shady = true;
-    /** Sets if it has an High Quality view */
-    protected boolean highQuality = true;
-    /** Double values for Horizontal and Vertical radius of corner arcs */
-    protected Dimension arcs = new Dimension(20, 20);
-    /** Distance between shadow border and opaque panel border */
-    protected int shadowGap = 5;
-    /** The offset of shadow.  */
-    protected int shadowOffset = 4;
-    /** The transparency value of shadow. ( 0 - 255) */
-    protected int shadowAlpha = 150;
+	private int type;
+	private JMenu current;
 
-	public Table(String tableName, Main main) {
+	/** Stroke size. it is recommended to set it to 1 for better view */
+	protected int strokeSize = 1;
+	/** Color of shadow */
+	protected Color shadowColor = Color.black;
+	/** Sets if it drops shadow */
+	protected boolean shady = true;
+	/** Sets if it has an High Quality view */
+	protected boolean highQuality = true;
+	/** Double values for Horizontal and Vertical radius of corner arcs */
+	protected Dimension arcs = new Dimension(20, 20);
+	/** Distance between shadow border and opaque panel border */
+	protected int shadowGap = 5;
+	/** The offset of shadow. */
+	protected int shadowOffset = 4;
+	/** The transparency value of shadow. ( 0 - 255) */
+	protected int shadowAlpha = 150;
+
+	public Table(String tableName, int type, Main main) {
 		super();
-        setOpaque(false);
-        
-       
+		setOpaque(false);
+
+		this.type = type;
 		this.main = main;
 		this.tableName = tableName;
 		order = new TableOrder(this);
-//		this.setLayout(new BorderLayout());
+		// this.setLayout(new BorderLayout());
 		container = new JPanel(new BorderLayout());
 		this.add(container);
-		 this.setPreferredSize(new Dimension(220,215));
+		// this.setPreferredSize(new Dimension(220,215));
 		// setMaximumSize(new Dimension(100,100));
+
+		setHireCost();
+		
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dimension = toolkit.getScreenSize();
+		int height = dimension.height;
+		int width = dimension.width;
+		this.setPreferredSize(new Dimension(width / 2 / 3, (height - 200) / 3));
 
 		JLabel name = new JLabel(tableName, JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 15));
@@ -77,6 +89,22 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		start.setActionCommand("start");
 		// JButton stop = new JButton("Stop");
 		// stop.setActionCommand("stop");
+		JMenuBar priceBar = new JMenuBar();
+		current = new JMenu("Full");
+		priceBar.add(current);
+		JMenuItem full = new JMenuItem("Full");
+		full.addActionListener(this);
+		full.setActionCommand("full");
+		JMenuItem half = new JMenuItem("Half");
+		half.addActionListener(this);
+		half.setActionCommand("half");
+		JMenuItem free = new JMenuItem("Free");
+		free.addActionListener(this);
+		free.setActionCommand("free");
+		current.add(full);
+		current.add(half);
+		current.add(free);
+		
 		priceButton = new JButton("PPH: "
 				+ formatter.format((priceConstant * 60 * 60.0)));
 		priceButton.setActionCommand("price");
@@ -94,9 +122,9 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		container.add(bottomBar, BorderLayout.SOUTH);
 
 		timerLabel = new JLabel(tableTime, JLabel.CENTER);
-		timerLabel.setFont(new Font(null, Font.PLAIN, 40));
+		timerLabel.setFont(new Font(null, Font.PLAIN, 35));
 		priceLabel = new JLabel(formatter.format(hirePrice), JLabel.CENTER);
-		priceLabel.setFont(new Font(null, Font.PLAIN, 20));
+		priceLabel.setFont(new Font(null, Font.PLAIN, 15));
 		center2 = new JPanel(new BorderLayout());
 		center2.add(timerLabel, BorderLayout.CENTER);
 		center2.add(priceLabel, BorderLayout.SOUTH);
@@ -106,7 +134,10 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		// JPanel bottomPanel = new JPanel();
 		topBottom = new JPanel();
 		bottomBar.add(topBottom, BorderLayout.NORTH);
-		topBottom.add(priceButton);
+		topBottom.add(priceBar);
+		currentPrice = new JLabel();
+		setCurrentPriceLabel();
+		topBottom.add(currentPrice);
 		// bottomPanel.add(priceButton, BorderLayout.SOUTH);
 
 		JButton detail = new JButton("Details");
@@ -141,9 +172,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		reset.addActionListener(this);
 
 		changeBackground(new Color(220, 20, 60));
-		
-		
-		
+
 	}
 
 	public TableOrder getOrder() {
@@ -181,11 +210,11 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 					running = false;
 				}
 				setTime(0, 0, 0);
-				hirePrice=0;
-				drinkPrice=0;
-				foodPrice=0;
-				extraPrice=0;
-				totalPrice=0;
+				hirePrice = 0;
+				drinkPrice = 0;
+				foodPrice = 0;
+				extraPrice = 0;
+				totalPrice = 0;
 				setPrice();
 				order.updatePrice();
 				stopWatch.reset();
@@ -228,13 +257,50 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 							.showMessageDialog(this, "Error: Input a number");
 				}
 			}
+		}else if("full".equals(e.getActionCommand())){
+			current.setText("Full");
+			changePrice(Globals.FULL);
+			setCurrentPriceLabel();			
+		}else if("half".equals(e.getActionCommand())){
+			current.setText("Half");
+			changePrice(Globals.HALF);
+			setCurrentPriceLabel();
+		}else if("free".equals(e.getActionCommand())){
+			current.setText("Free");
+			changePrice(Globals.FREE);
+			setCurrentPriceLabel();
 		}
 		main.resizeTables();
 
 	}
+	
+	private void changePrice(int level){
+		if(level==Globals.FULL){
+			priceConstant=fullPrice;
+		}else if(level==Globals.HALF){
+			priceConstant=fullPrice/2;
+		}else if(level==Globals.FREE){
+			priceConstant=0;
+		}
+		
+	}
 
 	public Main getMain() {
 		return main;
+	}
+	
+	private void setCurrentPriceLabel(){
+		currentPrice.setText(formatter.format(priceConstant*3600));
+	}
+	
+	private void setHireCost(){
+		//read in hireCosts
+		if(type==Globals.SNOOKER){
+			priceConstant = 6.6 / 60.0 / 60.0;
+		}else if(type==Globals.POOL){
+			priceConstant = 5 / 60.0 / 60.0;
+		}
+		fullPrice=priceConstant;
 	}
 
 	private void changeBackground(Color newColor) {
@@ -323,47 +389,46 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		// TODO Auto-generated method stub
 
 	}
-	
-	 @Override
-	    protected void paintComponent(Graphics g) {
-	        super.paintComponent(g);
-	        int width = getWidth();
-	        int height = getHeight();
-	        int shadowGap = this.shadowGap;
-	        Color shadowColorA = new Color(shadowColor.getRed(), 
-		shadowColor.getGreen(), shadowColor.getBlue(), shadowAlpha);
-	        Graphics2D graphics = (Graphics2D) g;
 
-	        //Sets antialiasing if HQ.
-	        if (highQuality) {
-	            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-				RenderingHints.VALUE_ANTIALIAS_ON);
-	        }
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		int width = getWidth();
+		int height = getHeight();
+		int shadowGap = this.shadowGap;
+		Color shadowColorA = new Color(shadowColor.getRed(),
+				shadowColor.getGreen(), shadowColor.getBlue(), shadowAlpha);
+		Graphics2D graphics = (Graphics2D) g;
 
-	        //Draws shadow borders if any.
-	        if (shady) {
-	            graphics.setColor(shadowColorA);
-	            graphics.fillRoundRect(
-	                    shadowOffset,// X position
-	                    shadowOffset,// Y position
-	                    width - strokeSize - shadowOffset, // width
-	                    height - strokeSize - shadowOffset, // height
-	                    arcs.width, arcs.height);// arc Dimension
-	        } else {
-	            shadowGap = 1;
-	        }
+		// Sets antialiasing if HQ.
+		if (highQuality) {
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+		}
 
-	        //Draws the rounded opaque panel with borders.
-	        graphics.setColor(getBackground());
-	        graphics.fillRoundRect(0, 0, width - shadowGap, 
-			height - shadowGap, arcs.width, arcs.height);
-	        graphics.setColor(getForeground());
-	        graphics.setStroke(new BasicStroke(strokeSize));
-	        graphics.drawRoundRect(0, 0, width - shadowGap, 
-			height - shadowGap, arcs.width, arcs.height);
+		// Draws shadow borders if any.
+		if (shady) {
+			graphics.setColor(shadowColorA);
+			graphics.fillRoundRect(shadowOffset,// X position
+					shadowOffset,// Y position
+					width - strokeSize - shadowOffset, // width
+					height - strokeSize - shadowOffset, // height
+					arcs.width, arcs.height);// arc Dimension
+		} else {
+			shadowGap = 1;
+		}
 
-	        //Sets strokes to default, is better.
-	        graphics.setStroke(new BasicStroke());
-	    }
+		// Draws the rounded opaque panel with borders.
+		graphics.setColor(getBackground());
+		graphics.fillRoundRect(0, 0, width - shadowGap, height - shadowGap,
+				arcs.width, arcs.height);
+		graphics.setColor(getForeground());
+		graphics.setStroke(new BasicStroke(strokeSize));
+		graphics.drawRoundRect(0, 0, width - shadowGap, height - shadowGap,
+				arcs.width, arcs.height);
+
+		// Sets strokes to default, is better.
+		graphics.setStroke(new BasicStroke());
+	}
 
 }

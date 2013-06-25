@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class Main extends JFrame implements ActionListener {
 
@@ -24,7 +26,7 @@ public class Main extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel tables, container, central, waitingList, bottomBar, rightCenter, detailPanel;
+	private JPanel snookerTables, poolTables, container, snookerHolder, poolHolder, waitingList, bottomBar, rightCenter, detailPanel;
 	private JScrollPane scroll;
 	private JLabel subTitle, clock;
 	private int numberOfTables = 0, active, detailShow;
@@ -39,7 +41,9 @@ public class Main extends JFrame implements ActionListener {
 		tableList = new ArrayList<Table>();
 		container = new JPanel(new BorderLayout());
 //		add(container);
-		color = new Color(56, 142, 142);
+//		color = new Color(56, 142, 142);
+		color = Color.DARK_GRAY;
+//		color = this.getBackground();
 		this.setVisible(true);
 //		this.setSize(900, 700);
 		this.setLayout(new BorderLayout());
@@ -68,6 +72,11 @@ public class Main extends JFrame implements ActionListener {
 		waitingListMenu.addActionListener(this);
 		file.add(waitingListMenu);
 		
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dimension = toolkit.getScreenSize();
+		int height = dimension.height;
+		int width = dimension.width;
+		setTitle("Snooker Club");
 		menu.add(file);
 		topPanel.add(menu, BorderLayout.NORTH);
 		JPanel topBar = new JPanel(new BorderLayout());
@@ -75,8 +84,8 @@ public class Main extends JFrame implements ActionListener {
 		topBar.setBackground(color);
 		JLabel name = new JLabel("Snooker Club", JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 30));
-		name.setForeground(Color.YELLOW);
-		topBar.add(name, BorderLayout.CENTER);
+		name.setForeground(Color.WHITE);
+//		topBar.add(name, BorderLayout.CENTER);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.add(topPanel, BorderLayout.NORTH);
 //		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
@@ -84,7 +93,7 @@ public class Main extends JFrame implements ActionListener {
 		Timer clockTime = new Timer(this);
 		clock = new JLabel("", JLabel.CENTER);
 		new Thread(clockTime).start();
-		clock.setForeground(Color.YELLOW);
+		clock.setForeground(Color.WHITE);
 		clock.setFont(new Font(null, Font.PLAIN, 20));
 		topBar.add(clock, BorderLayout.SOUTH);
 		scroll=new JScrollPane(container);
@@ -94,34 +103,43 @@ public class Main extends JFrame implements ActionListener {
 //		scroll.getViewport().add(central);
 //		container.add(scroll, BorderLayout.CENTER);
 //		this.add(container);
-		tables = new JPanel(new FlowLayout());
-		tables.setPreferredSize(new Dimension(680,660));
-//		tables.setMaximumSize(new Dimension(200,200));
-//		.setPreferredSize(nze(new Dimension(200,200));
-//		tables.setR
-//		tables = new JPanel(new FlowLayout());
-//		tables.setPreferredSize(new Dimension(100,100));
-//		tables.setSize(200, 200);
-
-		central = new JPanel();
+		
+		
+		snookerTables = new JPanel(new GridLayout(3,3,2,2));
+		snookerTables.setBorder(new EmptyBorder(6,6,6,6));
+		snookerTables.setBackground(color);
+		poolTables = new JPanel();
+		poolTables.setBorder(new EmptyBorder(6,6,6,6));
+		poolTables.setBackground(color);
+		
+		snookerHolder = new JPanel();
+		snookerHolder.setBackground(color);
+		snookerHolder.add(snookerTables);
+		poolHolder = new JPanel();
+		poolHolder.setBackground(color);
+		poolHolder.add(poolTables);
+		
+		JTabbedPane tabbed = new JTabbedPane();
+		tabbed.add("Snooker", snookerHolder);
+		tabbed.add("Pool", poolHolder);
+		
 		
 		container.setBackground(color);
+		
+		
 		scroll.setBackground(color);
+		scroll.setBorder(BorderFactory.createEmptyBorder());
 		
 		
 //		central.setPreferredSize(new Dimension(container.getWidth() - 10,
 //				container.getHeight() - 10));
-		container.add(central, BorderLayout.CENTER);
+		JPanel central = new JPanel();
+		central.add(tabbed);
 		central.setBackground(color);
-//		subTitle = new JLabel("Tables", JLabel.CENTER);
-//		subTitle.setFont(new Font(null, Font.BOLD, 20));
-//		central.add(subTitle, BorderLayout.NORTH);
-//		scroller = new JScrollPane(tables);
-//		central.add(scroller, BorderLayout.CENTER);
+		container.add(central, BorderLayout.CENTER);
 		
-		central.add(tables);
 		
-		tables.setBackground(color);
+
 		// for(int i=1; i<=numberOfTables; i++){
 		// Table table = new Table("Table "+i);
 		// tables.add(table);
@@ -158,7 +176,7 @@ public class Main extends JFrame implements ActionListener {
 		detailPanel.setBackground(color);
 		rightCenter.add(detailPanel);
 		
-		waitingList = new WaitingList();
+		waitingList = new WaitingList(this);
 		
 		rightCenter.add(waitingList);
 		waitingList.setVisible(false);
@@ -178,10 +196,11 @@ public class Main extends JFrame implements ActionListener {
 //		Toolkit toolkit = Toolkit.getDefaultToolkit();
 //		Dimension dimension = toolkit.getScreenSize();
 //		this.setSize(dimension);
-		
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent comp) {
 				resizeTables();
+				
+				
 			}
 		});
 		
@@ -196,22 +215,22 @@ public class Main extends JFrame implements ActionListener {
 		clock.setText(dateFormat.format(cal.getTime()));
 	}
 
-	public void toggleTablesVisibility() {
-
-		if (active != 0) {
-//			central.add(scroller, BorderLayout.CENTER);
-			
-			central.add(tables, BorderLayout.CENTER);
-			
-			subTitle.setText("Tables");
-			active = 0;
-			settings.setVisible(true);
-			updateUI();
-		} else {
-			central.remove(tables);
-			updateUI();
-		}
-	}
+//	public void toggleTablesVisibility() {
+//
+//		if (active != 0) {
+////			central.add(scroller, BorderLayout.CENTER);
+//			
+//			central.add(snookerTables, BorderLayout.CENTER);
+//			
+//			subTitle.setText("Tables");
+//			active = 0;
+//			settings.setVisible(true);
+//			updateUI();
+//		} else {
+//			central.remove(snookerTables);
+//			updateUI();
+//		}
+//	}
 
 	public void toggleOrderVisibility(Table table) {
 //		showingOrder = table;
@@ -267,17 +286,19 @@ public class Main extends JFrame implements ActionListener {
 //		}
 		if (newTables > numberOfTables) {
 			for (int i = numberOfTables; i < newTables; i++) {
-				Table table = new Table("Table " + (i + 1), this);
-				tables.add(table);
+				Table table = new Table("Table " + (i + 1), Globals.SNOOKER, this);
+				snookerTables.add(table);
 				tableList.add(table);
 			}
 		}
 		if (newTables < numberOfTables) {
 			for (int i = numberOfTables; i > newTables; i--) {
-				tables.remove(tableList.get(i - 1));
+				snookerTables.remove(tableList.get(i - 1));
 				tableList.remove(i - 1);
 			}
 		}
+		Table table= new Table("Table 0", Globals.POOL, this);
+		poolTables.add(table);
 		numberOfTables = newTables;
 		// tables.removeAll();
 		// for(int i=1; i<=numberOfTables; i++){
@@ -306,8 +327,8 @@ public class Main extends JFrame implements ActionListener {
 	private void updateUI() {
 		this.validate();
 		detailPanel.validate();
-		tables.validate();
-		central.validate();
+		snookerTables.validate();
+		snookerHolder.validate();
 		container.validate();
 		scroll.validate();
 		
@@ -333,8 +354,13 @@ public class Main extends JFrame implements ActionListener {
 //
 //		central.setPreferredSize(central.getPreferredSize());
 //		pack();
+
+//		System.out.println(this.getExtendedState());
+		if(this.getExtendedState() == Frame.MAXIMIZED_BOTH){
+		}else{
+			pack();
+		}
 		updateUI();
-//		pack();
 	}
 
 	public static void main(String[] args) {
@@ -360,9 +386,11 @@ public class Main extends JFrame implements ActionListener {
 			if (waitingList.isVisible()) {
 				waitingList.setVisible(false);
 				resizeTables();
+//				pack();
 			} else {
 				waitingList.setVisible(true);
 				resizeTables();
+//				pack();
 			}
 		}
 
