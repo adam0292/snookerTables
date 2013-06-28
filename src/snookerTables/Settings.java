@@ -44,7 +44,6 @@ public class Settings extends JFrame implements ActionListener {
 		// centerBox.add(tableSetts);
 		JLabel numOfTables = new JLabel("Number of Tables: ");
 		// centerBox.add(numOfTables);
-		tables = new JTextField("" + main.getNumberOfTables(), 4);
 		// centerBox.add(tables);
 		// JPanel priceSetts = new JPanel();
 		// centerBox.add(priceSetts);
@@ -98,21 +97,6 @@ public class Settings extends JFrame implements ActionListener {
 		}
 		if ("apply".equals(e.getActionCommand())) {
 			boolean success = true;
-			if (!(tables.getText().equals(main.getNumberOfTables()))) {
-				try {
-					if (!(Integer.parseInt(tables.getText()) < 0)) {
-						main.newTables(Integer.parseInt(tables.getText()));
-					} else {
-						JOptionPane.showMessageDialog(this,
-								"Number of tables must be positive.");
-						success = false;
-					}
-				} catch (NumberFormatException ex) {
-					success = false;
-					JOptionPane.showMessageDialog(this,
-							"Number of tables must be an integer.");
-				}
-			}
 			if (!price.getText().equals("")) {
 				try {
 					main.setSnookerAllPrices(Double.parseDouble(price.getText()));
