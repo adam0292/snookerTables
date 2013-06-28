@@ -26,8 +26,8 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private Timer stopWatch = new Timer(this);
 	private String tableTime = "0:0:0", tableName;
 	private double hirePrice = 0.00, priceConstant,
-			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice;
-	private JLabel timerLabel, priceLabel, currentPrice;
+			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice, savedPrice, currentPrice;
+	private JLabel timerLabel, priceLabel, currentPriceLabel;
 	private boolean running = false;
 	private JPanel center, controls, bottomBar, center2, topBottom,
 			bottomBottom, container;
@@ -35,7 +35,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private NumberFormat formatter;
 	private Main main;
 	private int timeElapsed;
-	private int type;
+	private int type, savedTime;
 	private JMenu current;
 
 	/** Stroke size. it is recommended to set it to 1 for better view */
@@ -135,9 +135,9 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		topBottom = new JPanel();
 		bottomBar.add(topBottom, BorderLayout.NORTH);
 		topBottom.add(priceBar);
-		currentPrice = new JLabel();
+		currentPriceLabel = new JLabel();
 		setCurrentPriceLabel();
-		topBottom.add(currentPrice);
+		topBottom.add(currentPriceLabel);
 		// bottomPanel.add(priceButton, BorderLayout.SOUTH);
 
 		JButton detail = new JButton("Details");
@@ -215,12 +215,17 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 				foodPrice = 0;
 				extraPrice = 0;
 				totalPrice = 0;
+				savedTime = 0;
+				savedPrice = 0;
 				setPrice();
 				order.updatePrice();
 				stopWatch.reset();
 				changeBackground(new Color(220, 20, 60));
 				start.setText("Start");
 				start.setActionCommand("start");
+				current.setText("Full");
+				changePrice(Globals.FULL);
+				setCurrentPriceLabel();	
 			}
 		} else if ("detail".equals(e.getActionCommand())) {
 			main.toggleOrderVisibility(this);
@@ -277,10 +282,19 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private void changePrice(int level){
 		if(level==Globals.FULL){
 			priceConstant=fullPrice;
+			savedPrice = savedPrice + currentPrice;
+			currentPrice=0;
+			savedTime = timeElapsed;
 		}else if(level==Globals.HALF){
 			priceConstant=fullPrice/2;
+			savedPrice = savedPrice + currentPrice;
+			currentPrice=0;
+			savedTime = timeElapsed;
 		}else if(level==Globals.FREE){
 			priceConstant=0;
+			savedPrice = savedPrice + currentPrice;
+			currentPrice=0;
+			savedTime = timeElapsed;
 		}
 		
 	}
@@ -290,13 +304,13 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	}
 	
 	private void setCurrentPriceLabel(){
-		currentPrice.setText(formatter.format(priceConstant*3600));
+		currentPriceLabel.setText(formatter.format(priceConstant*3600));
 	}
 	
 	private void setHireCost(){
 		//read in hireCosts
 		if(type==Globals.SNOOKER){
-			priceConstant = 6.6 / 60.0 / 60.0;
+			priceConstant = 36 / 60.0 / 60.0;
 		}else if(type==Globals.POOL){
 			priceConstant = 5 / 60.0 / 60.0;
 		}
@@ -327,7 +341,10 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	}
 
 	public void setPrice() {
-		hirePrice = timeElapsed * priceConstant;
+		
+		
+		currentPrice = (timeElapsed-savedTime) * priceConstant;		
+		hirePrice = currentPrice+savedPrice;
 		totalPrice = hirePrice + drinkPrice + foodPrice + extraPrice;
 		priceLabel.setText(formatter.format(totalPrice));
 	}

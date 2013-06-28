@@ -26,43 +26,58 @@ public class Main extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel snookerTables, poolTables, container, snookerHolder, poolHolder, waitingList, bottomBar, rightCenter, detailPanel;
+	private JPanel snookerTables, poolTables, container, snookerHolder,
+			poolHolder, waitingList, bottomBar, rightCenter, detailPanel;
 	private JScrollPane scroll;
 	private JLabel subTitle, clock;
 	private int numberOfTables = 0, active, detailShow;
-	private ArrayList<Table> tableList;
-	private JButton tableReturn, settings;
+	private ArrayList<Table> snookerTableList, poolTableList;
+	private JButton tableReturn;
 	private Table showingOrder;
 	private Color color;
 	private GridLayout detailGridLay;
-	private final int DETAILWIDTH=3;
+	private final int DETAILWIDTH = 3;
 
 	public Main() {
-		tableList = new ArrayList<Table>();
-		container = new JPanel(new BorderLayout());
-//		add(container);
-//		color = new Color(56, 142, 142);
+
+		
+
+		// Set variables with height and width of screen
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dimension = toolkit.getScreenSize();
+		int height = dimension.height;
+		int width = dimension.width;
+
+		// Set title
+		setTitle("Snooker Club");
+		// Define the main background color
 		color = Color.DARK_GRAY;
-//		color = this.getBackground();
+		// Make the frame visible
 		this.setVisible(true);
-//		this.setSize(900, 700);
+		// Set default close action
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		// Set the layout
 		this.setLayout(new BorderLayout());
+		// Set the color
 		this.getContentPane().setBackground(color);
-		
-		
-		try{ 
-//			   UIManager.setLookAndFeel(
-//			        UIManager.getSystemLookAndFeelClassName());
-			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-			}
-			catch(Exception e){
-			 e.printStackTrace();
-			}
-		
+		// Set the look and feel
+		try {
+			UIManager
+					.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Create main pane for frame and set color
+		container = new JPanel(new BorderLayout());
+		container.setBackground(color);
+		// Initialise the top panel
 		JPanel topPanel = new JPanel(new BorderLayout());
+
+		// Create the menu bar
 		JMenuBar menu = new JMenuBar();
+		// Create items for the menu and set action commands and listeners
 		JMenu file = new JMenu("File");
-		
 		JMenuItem settingsMenu = new JMenuItem("Settings");
 		settingsMenu.setActionCommand("settings");
 		settingsMenu.addActionListener(this);
@@ -71,259 +86,221 @@ public class Main extends JFrame implements ActionListener {
 		waitingListMenu.setActionCommand("waiting");
 		waitingListMenu.addActionListener(this);
 		file.add(waitingListMenu);
-		
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension dimension = toolkit.getScreenSize();
-		int height = dimension.height;
-		int width = dimension.width;
-		setTitle("Snooker Club");
 		menu.add(file);
+		// Add menu to the topPanel
 		topPanel.add(menu, BorderLayout.NORTH);
+
+		// Create the top bar
 		JPanel topBar = new JPanel(new BorderLayout());
+		// add the topBar to the topPanel
 		topPanel.add(topBar, BorderLayout.CENTER);
+		// Set the color of the topBar
 		topBar.setBackground(color);
-		JLabel name = new JLabel("Snooker Club", JLabel.CENTER);
-		name.setFont(new Font(null, Font.BOLD, 30));
-		name.setForeground(Color.WHITE);
-//		topBar.add(name, BorderLayout.CENTER);
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		// //Create a title label for the frame
+		// JLabel name = new JLabel("Snooker Club", JLabel.CENTER);
+		// name.setFont(new Font(null, Font.BOLD, 30));
+		// name.setForeground(Color.WHITE);
+		// topBar.add(name, BorderLayout.CENTER);
+
+		// Add the topPanel to the frame
 		this.add(topPanel, BorderLayout.NORTH);
-//		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
-//				.getHeight() - 140));
+
+		// Create a timer for the clock
 		Timer clockTime = new Timer(this);
+		// Create a label for the clock
 		clock = new JLabel("", JLabel.CENTER);
+		// start the clock
 		new Thread(clockTime).start();
+		// Set color's and font for the clock
 		clock.setForeground(Color.WHITE);
 		clock.setFont(new Font(null, Font.PLAIN, 20));
+		// Add clock to the topBar
 		topBar.add(clock, BorderLayout.SOUTH);
-		scroll=new JScrollPane(container);
-//		container.setPreferredSize(new Dimension(300,300));
+
+		// Create the scrollPane, set the color and border
+		scroll = new JScrollPane(container);
+		scroll.setBackground(color);
+		scroll.setBorder(BorderFactory.createEmptyBorder());
+		// Add the scrollPane to the frame
 		this.add(scroll, BorderLayout.CENTER);
-//		scroll = new JScrollPane();
-//		scroll.getViewport().add(central);
-//		container.add(scroll, BorderLayout.CENTER);
-//		this.add(container);
-		
-		
-		snookerTables = new JPanel(new GridLayout(3,3,2,2));
-		snookerTables.setBorder(new EmptyBorder(6,6,6,6));
+
+		// Create the snookerTables panel and set border and color
+		snookerTables = new JPanel(new GridLayout(3, 3, 2, 2));
+		snookerTables.setBorder(new EmptyBorder(6, 6, 6, 6));
 		snookerTables.setBackground(color);
+		// Create the poolTables panel and set border and color
 		poolTables = new JPanel();
-		poolTables.setBorder(new EmptyBorder(6,6,6,6));
+		poolTables.setBorder(new EmptyBorder(6, 6, 6, 6));
 		poolTables.setBackground(color);
-		
+
+		// Create the holder panels fpr the snooker and pool tables and set
+		// color
 		snookerHolder = new JPanel();
 		snookerHolder.setBackground(color);
 		snookerHolder.add(snookerTables);
 		poolHolder = new JPanel();
 		poolHolder.setBackground(color);
 		poolHolder.add(poolTables);
-		
+
+		// Create the tabbed pane and add the snooker and pool holders
 		JTabbedPane tabbed = new JTabbedPane();
 		tabbed.add("Snooker", snookerHolder);
 		tabbed.add("Pool", poolHolder);
-		
-		
-		container.setBackground(color);
-		
-		
-		scroll.setBackground(color);
-		scroll.setBorder(BorderFactory.createEmptyBorder());
-		
-		
-//		central.setPreferredSize(new Dimension(container.getWidth() - 10,
-//				container.getHeight() - 10));
+
+		// Create the central pane and set color
 		JPanel central = new JPanel();
-		central.add(tabbed);
 		central.setBackground(color);
+		// add the tabbed pain to it
+		central.add(tabbed);
+		// add the tabbed pain to the central panel
 		container.add(central, BorderLayout.CENTER);
-		
-		
 
-		// for(int i=1; i<=numberOfTables; i++){
-		// Table table = new Table("Table "+i);
-		// tables.add(table);
-		// }
-		
-//		int numberPerRow = (this.getWidth() - 100) / 260;
-//		Double number = (double) numberOfTables / (double) numberPerRow;
-//		int numberPerColumn = (int) Math.ceil(number);
-//		scroller.setPreferredSize(new Dimension(this.getWidth() - 40, this
-//				.getHeight() - 120));
-//		tables.setPreferredSize(new Dimension(this.getWidth() - 100,
-//				numberPerColumn * 310));
-
+		// Create a panel for the right center and set color
 		rightCenter = new JPanel();
 		rightCenter.setBackground(color);
+		// add the pain to the container
 		container.add(rightCenter, BorderLayout.EAST);
-		   
 
-		bottomBar = new JPanel();
-		bottomBar.setBackground(color);
-//		central.add(bottomBar, BorderLayout.SOUTH);
-		settings = new JButton("Settings");
-		settings.setActionCommand("settings");
-		settings.addActionListener(this);
-		bottomBar.add(settings);
+		// //create a bottomBar and set color
+		// bottomBar = new JPanel();
+		// bottomBar.setBackground(color);
+		// //create the buttons for the bottom bar
+		// JButton settings = new JButton("Settings");
+		// settings.setActionCommand("settings");
+		// settings.addActionListener(this);
+		// bottomBar.add(settings);
+		// JButton showWaiting = new JButton("Waiting List");
+		// showWaiting.setActionCommand("waiting");
+		// showWaiting.addActionListener(this);
+		// bottomBar.add(showWaiting);
+		// //add bottomBar to container
+		// container.add(bottomBar, BorderLayout.SOUTH);
 
-		JButton showWaiting = new JButton("Waiting List");
-		showWaiting.setActionCommand("waiting");
-		showWaiting.addActionListener(this);
-		bottomBar.add(showWaiting);
-		
+		// create a gridLayout
 		detailGridLay = new GridLayout(0, 1, 4, 4);
-		detailPanel = new JPanel(detailGridLay);
+		// create the detailPane with gridLayout, set color
+		detailPanel = new JPanel(new GridLayout(0, 1, 4, 4));
 		detailPanel.setBackground(color);
+		// add to rightCenter
 		rightCenter.add(detailPanel);
-		
+
+		// Create the waitingList
 		waitingList = new WaitingList(this);
-		
+		// Add to right center
 		rightCenter.add(waitingList);
+		// Hide waitingList
 		waitingList.setVisible(false);
-		
-		tableReturn = new JButton("Tables");
-		tableReturn.setActionCommand("table");
-		tableReturn.addActionListener(this);
-		tableReturn.setVisible(false);
-		bottomBar.add(tableReturn);
-		
-		addTables(9);
-		
-		updateUI();
-		pack();
-		
-//		this.setState(JFrame.NORMAL);
-//		Toolkit toolkit = Toolkit.getDefaultToolkit();
-//		Dimension dimension = toolkit.getScreenSize();
-//		this.setSize(dimension);
+
+		//Initalises the lists for the tables
+		snookerTableList = new ArrayList<Table>();
+		poolTableList = new ArrayList<Table>();
+		// Create the tables
+		addTables(Globals.NUMSNOOKERTABLES, Globals.NUMPOOLTABLES);
+
+		// update panels
+		resizeTables();
+
+		// On resize refresh tables
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent comp) {
 				resizeTables();
-				
-				
+
 			}
 		});
-		
-//		container.setPreferredSize(new Dimension(200,200));
-//		pack();
 
 	}
-	
+
+	/**
+	 * Method call to set the clock
+	 */
 	public void setClock() {
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 		Calendar cal = Calendar.getInstance();
+		// Sets the clock label to the current time
 		clock.setText(dateFormat.format(cal.getTime()));
 	}
 
-//	public void toggleTablesVisibility() {
-//
-//		if (active != 0) {
-////			central.add(scroller, BorderLayout.CENTER);
-//			
-//			central.add(snookerTables, BorderLayout.CENTER);
-//			
-//			subTitle.setText("Tables");
-//			active = 0;
-//			settings.setVisible(true);
-//			updateUI();
-//		} else {
-//			central.remove(snookerTables);
-//			updateUI();
-//		}
-//	}
-
+	/**
+	 * Method to show the order for a chosen table
+	 * 
+	 * @param table
+	 *            The table to show the order for
+	 */
 	public void toggleOrderVisibility(Table table) {
-//		showingOrder = table;
-//		showingOrder.getOrder().toggleVisible();
-		if(table.getOrder().isShown()){
+		// Checks if the order is already visible
+		if (table.getOrder().isShown()) { // if it is visible then remove it
 			detailPanel.remove(table.getOrder());
 			table.getOrder().setShown(false);
 			detailShow--;
-			if(detailShow<=DETAILWIDTH&&detailShow>0){
+			// and adjust the size of the panel
+			if (detailShow <= DETAILWIDTH && detailShow > 0) {
 				detailGridLay.setColumns(detailShow);
-				}else if(detailShow==0){
-					detailGridLay.setColumns(1);
-				}else{
-					detailGridLay.setColumns(DETAILWIDTH);
-				}
-		}else{
-			detailShow++;
-			if(detailShow<=DETAILWIDTH){
-			detailGridLay.setColumns(detailShow);
-			}else{
+			} else if (detailShow == 0) {
+				detailGridLay.setColumns(1);
+			} else {
 				detailGridLay.setColumns(DETAILWIDTH);
 			}
-		detailPanel.add(table.getOrder(), BorderLayout.WEST);
-		table.getOrder().setShown(true);
-		
-		}
-		resizeTables();
-		// if(active!=1){
-		// turnActiveOff();
-		// central.add(table.getOrder(), BorderLayout.CENTER);
-		// table.getOrder().setPreferredSize(new Dimension(this.getWidth()-40,
-		// this.getHeight()-120));
-		// table.getOrder().setBackground(color);
-		// tableReturn.setVisible(true);
-		// settings.setVisible(false);
-		// active=1;
-		// subTitle.setText("Order");
-		// updateUI();
-		// }else{
-		// central.remove(table.getOrder());
-		// toggleTablesVisibility();
-		// tableReturn.setVisible(false);
-		// updateUI();
-		// }
+		} else { // if it's not visible then add it
+			detailShow++;
+			if (detailShow <= DETAILWIDTH) { // adjust the size of the panel
+				detailGridLay.setColumns(detailShow);
+			} else {
+				detailGridLay.setColumns(DETAILWIDTH);
+			}
+			detailPanel.add(table.getOrder(), BorderLayout.WEST);
+			table.getOrder().setShown(true);
 
+		}
+		resizeTables(); // refresh tables
+	}
+
+	/**
+	 * Creates the snooker and pool tables
+	 * 
+	 * @param numSnookerTables
+	 *            number of snooker tables
+	 * @param numPoolTables
+	 *            number of pool tables
+	 */
+	public void addTables(int numSnookerTables, int numPoolTables) {
+		// Creates the snooker tables
+		for (int i = 0; i < numSnookerTables; i++) { // adds the snooker tables
+			Table table = new Table("Table " + (i + 1), Globals.SNOOKER, this);
+			snookerTables.add(table);
+			snookerTableList.add(table);
+		}
+		// Creates the pool tables
+		for (int i = 0; i < numPoolTables; i++) { // adds the snooker tables
+			Table table = new Table("Table " + (i), Globals.POOL, this);
+			poolTables.add(table);
+			poolTableList.add(table);
+		}
+	}
+
+	/**
+	 * Sets the price for all snooker tables
+	 * @param price The price to set them to
+	 */
+	public void setSnookerAllPrices(double price) {
+		for (int i = 0; i < snookerTableList.size(); i++) {
+			snookerTableList.get(i).setPriceConstant(price);
+		}
 	}
 	
-	public void addTables(int newTables) {
-		
-//		for(int i=0; i<newTables; i++){
-//			Table table = new Table("Table "+(i+1), this);
-//			tables.add(table, )
-//		}
-		if (newTables > numberOfTables) {
-			for (int i = numberOfTables; i < newTables; i++) {
-				Table table = new Table("Table " + (i + 1), Globals.SNOOKER, this);
-				snookerTables.add(table);
-				tableList.add(table);
-			}
+	/**
+	 * Sets the price for all pool tables
+	 * @param price The price to set them to
+	 */
+	public void setPoolAllPrices(double price) {
+		for (int i = 0; i < poolTableList.size(); i++) {
+			poolTableList.get(i).setPriceConstant(price);
 		}
-		if (newTables < numberOfTables) {
-			for (int i = numberOfTables; i > newTables; i--) {
-				snookerTables.remove(tableList.get(i - 1));
-				tableList.remove(i - 1);
-			}
-		}
-		Table table= new Table("Table 0", Globals.POOL, this);
-		poolTables.add(table);
-		numberOfTables = newTables;
-		// tables.removeAll();
-		// for(int i=1; i<=numberOfTables; i++){
-		// Table table = new Table("Table "+i);
-		// tables.add(table);
-		// tableList.add(table);
-		// }
 	}
-
-	public void setAllPrices(double price) {
-		for (int i = 0; i < tableList.size(); i++) {
-			tableList.get(i).setPriceConstant(price);
-		}
-
-	}
-
-	public int getNumberOfTables() {
-		return numberOfTables;
-	}
-
-	public void newTables(int number) {
-		addTables(number);
-		resizeTables();
-	}
-
+	
+	/**
+	 * Updates the panels
+	 */
 	private void updateUI() {
 		this.validate();
 		detailPanel.validate();
@@ -331,67 +308,42 @@ public class Main extends JFrame implements ActionListener {
 		snookerHolder.validate();
 		container.validate();
 		scroll.validate();
-		
+
 	}
 
+	/**
+	 * Resizes the frame
+	 */
 	public void resizeTables() {
-//		scroller.setPreferredSize(new Dimension(this.getWidth() - 40, this
-//				.getHeight() - 120));
-//		container.setPreferredSize(new Dimension(this.getWidth() - 10, this
-//				.getHeight() - 40));
-//		int numberPerRow = (this.getWidth() - 40) / 260;
-//		Double number = (double) numberOfTables / (double) numberPerRow;
-//		int numberPerColumn = (int) Math.ceil(number);
-//		// System.out.println(numberPerRow);
-//		central.setPreferredSize(new Dimension(container.getWidth() - 10,
-//				container.getHeight() - 10));
-//		tables.setPreferredSize(new Dimension(this.getWidth() - 100,
-//				numberPerColumn * 310));
-
-//		tables.setPreferredSize(new Dimension(this.getWidth()-800, this.getHeight()));
-//		central.setPreferredSize(new Dimension(this.getWidth()-800, this.getHeight()));
-//		container.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()-40));
-//
-//		central.setPreferredSize(central.getPreferredSize());
-//		pack();
-
-//		System.out.println(this.getExtendedState());
-		if(this.getExtendedState() == Frame.MAXIMIZED_BOTH){
-		}else{
-			pack();
+		if (this.getExtendedState() == Frame.MAXIMIZED_BOTH) { //If window is maximised do nothing
+		} else {
+			pack(); //resize
 		}
 		updateUI();
 	}
 
+	/**
+	 * Main method to create the frame
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		new Main();
 	}
 
-//	private void turnActiveOff() {
-//		if (active == 0) {
-//			toggleTablesVisibility();
-//		}
-//		if (active == 1) {
-//			toggleOrderVisibility(tableList.get(0));
-//		}
-//	}
-
+	/**
+	 * Method called when an action is performed
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if ("settings".equals(e.getActionCommand())) {
-			new Settings(this);
-		} else if ("table".equals(e.getActionCommand())) {
-			toggleOrderVisibility(showingOrder);
-		} else if ("waiting".equals(e.getActionCommand())) {
+		if ("settings".equals(e.getActionCommand())) { //if settings is pressed
+			new Settings(this); //
+		} else if ("waiting".equals(e.getActionCommand())) { //if waiting is pressed
 			if (waitingList.isVisible()) {
-				waitingList.setVisible(false);
-				resizeTables();
-//				pack();
+				waitingList.setVisible(false); //show waiting pane if hidden
 			} else {
-				waitingList.setVisible(true);
-				resizeTables();
-//				pack();
+				waitingList.setVisible(true); //hide waiting pane if visible
 			}
+			resizeTables();
 		}
 
 	}
