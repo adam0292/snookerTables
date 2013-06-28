@@ -3,7 +3,6 @@ package snookerTables;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -27,13 +26,11 @@ public class Main extends JFrame implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel snookerTables, poolTables, container, snookerHolder,
-			poolHolder, waitingList, bottomBar, rightCenter, detailPanel;
+			poolHolder, waitingList, rightCenter, detailPanel;
 	private JScrollPane scroll;
-	private JLabel subTitle, clock;
-	private int numberOfTables = 0, active, detailShow;
+	private JLabel clock;
+	private int detailShow;
 	private ArrayList<Table> snookerTableList, poolTableList;
-	private JButton tableReturn;
-	private Table showingOrder;
 	private Color color;
 	private GridLayout detailGridLay;
 	private final int DETAILWIDTH = 3;
@@ -85,8 +82,12 @@ public class Main extends JFrame implements ActionListener {
 		JMenuItem waitingListMenu = new JMenuItem("Waiting List");
 		waitingListMenu.setActionCommand("waiting");
 		waitingListMenu.addActionListener(this);
-		file.add(waitingListMenu);
 		menu.add(file);
+		menu.add(waitingListMenu);
+		JMenuItem exit = new JMenuItem("Exit");
+		exit.setActionCommand("exit");
+		exit.addActionListener(this);
+		file.add(exit);
 		// Add menu to the topPanel
 		topPanel.add(menu, BorderLayout.NORTH);
 
@@ -344,6 +345,10 @@ public class Main extends JFrame implements ActionListener {
 				waitingList.setVisible(true); //hide waiting pane if visible
 			}
 			resizeTables();
+		}else if("exit".equals(e.getActionCommand())){
+			if(JOptionPane.showConfirmDialog(this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION)==0){
+				System.exit(0);
+			}
 		}
 
 	}

@@ -23,7 +23,7 @@ public class TableOrder extends JPanel implements ActionListener{
 
 	private Table table;
 	private NumberFormat formatter;
-	private JLabel hirePriceLabel, drinkPriceLabel, foodPriceLabel, extraPriceLabel, totalPriceLabel;
+	private JLabel hirePriceLabel, drinkPriceLabel, foodPriceLabel, extraPriceLabel, totalPriceLabel, membershipPriceLabel;
 	private boolean shown;
 	
 	 /** Stroke size. it is recommended to set it to 1 for better view */
@@ -76,6 +76,9 @@ public class TableOrder extends JPanel implements ActionListener{
 		extraPriceLabel=new JLabel("Extra Cost: £0.00");
 		central.add(extraPriceLabel);
 		
+		membershipPriceLabel=new JLabel("Membership Cost: £0.00");
+		central.add(membershipPriceLabel);
+		
 		totalPriceLabel=new JLabel("Total: £0.00");
 		central.add(totalPriceLabel);
 		totalPriceLabel.setForeground(Color.RED);
@@ -109,12 +112,16 @@ public class TableOrder extends JPanel implements ActionListener{
 		double extraPrice = table.getExtraPrice();
 		extraPriceLabel.setText("Extra Cost: "+formatter.format(extraPrice));
 		
+		double membershipPrice = table.getMembershipPrice();
+		membershipPriceLabel.setText("Membership Cost: "+formatter.format(membershipPrice));
+		
 		double totalPrice = hirePrice+drinkPrice+foodPrice+extraPrice;
 		totalPriceLabel.setText("Total: "+formatter.format(totalPrice));
 		
 		
 		
 	}
+
 	
 //	public void toggleVisible(){
 //		this.setVisible(true);

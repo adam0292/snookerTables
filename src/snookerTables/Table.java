@@ -26,14 +26,15 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private Timer stopWatch = new Timer(this);
 	private String tableTime = "0:0:0", tableName;
 	private double hirePrice = 0.00, priceConstant,
-			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice, savedPrice, currentPrice;
+			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice, savedPrice, currentPrice, membershipPrice;
 	private JLabel timerLabel, priceLabel, currentPriceLabel;
 	private boolean running = false;
 	private JPanel center, controls, bottomBar, center2, topBottom,
 			bottomBottom, container;
-	private JButton start, priceButton;
+	private JButton start, priceButton, changeRate;
 	private NumberFormat formatter;
 	private Main main;
+	private JPopupMenu extraPopup, extraRate;
 	private int timeElapsed;
 	private int type, savedTime;
 	private JMenu current;
@@ -87,11 +88,24 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 
 		start = new JButton("Start");
 		start.setActionCommand("start");
-		// JButton stop = new JButton("Stop");
-		// stop.setActionCommand("stop");
-		JMenuBar priceBar = new JMenuBar();
-		current = new JMenu("Full");
-		priceBar.add(current);
+
+		extraRate = new JPopupMenu();
+		changeRate = new JButton("Full");
+		changeRate.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e){
+				extraRate.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
+		
+		bottomBar = new JPanel(new BorderLayout());
+		container.add(bottomBar, BorderLayout.SOUTH);
+		bottomBar.add(changeRate);
+		topBottom = new JPanel();
+		bottomBar.add(topBottom, BorderLayout.NORTH);
+		topBottom.add(changeRate);
+
+		
+		
 		JMenuItem full = new JMenuItem("Full");
 		full.addActionListener(this);
 		full.setActionCommand("full");
@@ -101,9 +115,9 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		JMenuItem free = new JMenuItem("Free");
 		free.addActionListener(this);
 		free.setActionCommand("free");
-		current.add(full);
-		current.add(half);
-		current.add(free);
+		extraRate.add(full);
+		extraRate.add(half);
+		extraRate.add(free);
 		
 		priceButton = new JButton("PPH: "
 				+ formatter.format((priceConstant * 60 * 60.0)));
@@ -118,9 +132,8 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		center = new JPanel(new BorderLayout());
 		center.add(controls, BorderLayout.NORTH);
 
-		bottomBar = new JPanel(new BorderLayout());
-		container.add(bottomBar, BorderLayout.SOUTH);
-
+	
+		
 		timerLabel = new JLabel(tableTime, JLabel.CENTER);
 		timerLabel.setFont(new Font(null, Font.PLAIN, 35));
 		priceLabel = new JLabel(formatter.format(hirePrice), JLabel.CENTER);
@@ -132,9 +145,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		center.add(center2, BorderLayout.CENTER);
 
 		// JPanel bottomPanel = new JPanel();
-		topBottom = new JPanel();
-		bottomBar.add(topBottom, BorderLayout.NORTH);
-		topBottom.add(priceBar);
+		
 		currentPriceLabel = new JLabel();
 		setCurrentPriceLabel();
 		topBottom.add(currentPriceLabel);
@@ -147,24 +158,47 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		// JButton orders = new JButton("Orders");
 		// orders.setActionCommand("orders");
 		// bottomPanel.add(orders);
-
+ 
+		
+		
 		bottomBottom = new JPanel();
 		bottomBar.add(bottomBottom, BorderLayout.SOUTH);
-
-		JButton drink = new JButton("Drink");
+		
+		extraPopup = new JPopupMenu();
+		JButton addExtra = new JButton("Add");
+		bottomBar.add(addExtra);
+		addExtra.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e){
+				extraPopup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
+		bottomBar.add(addExtra);
+		
+//		JMenuBar bottomMenu= new JMenuBar();
+//		bottomBar.add(bottomMenu);
+		
+//		JMenu addExtra = new JMenu("Add");
+//		bottomMenu.add(addExtra);
+		
+		JMenuItem drink = new JMenuItem("Drink");
 		drink.setActionCommand("drink");
 		drink.addActionListener(this);
-		bottomBottom.add(drink);
+		extraPopup.add(drink);
 
-		JButton food = new JButton("Food");
+		JMenuItem food = new JMenuItem("Food");
 		food.setActionCommand("food");
 		food.addActionListener(this);
-		bottomBottom.add(food);
+		extraPopup.add(food);
 
-		JButton extra = new JButton("Extra");
+		JMenuItem extra = new JMenuItem("Extra");
 		extra.setActionCommand("extra");
 		extra.addActionListener(this);
-		bottomBottom.add(extra);
+		extraPopup.add(extra);
+		
+		JMenuItem membership = new JMenuItem("Membersjip");
+		membership.setActionCommand("membership");
+		membership.addActionListener(this);
+		extraPopup.add(membership);
 
 		start.addActionListener(this);
 		// orders.addActionListener(this);
@@ -262,16 +296,28 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 							.showMessageDialog(this, "Error: Input a number");
 				}
 			}
-		}else if("full".equals(e.getActionCommand())){
-			current.setText("Full");
+			
+		}else if ("membership".equals(e.getActionCommand())) {
+			String mess = JOptionPane.showInputDialog("Price of Membership (£)");
+			if (mess != null) {
+				try {
+					membershipPrice += Double.parseDouble(mess);
+					setPrice();
+				} catch (NumberFormatException f) {
+					JOptionPane
+							.showMessageDialog(this, "Error: Input a number");
+				}
+			}
+			}else if("full".equals(e.getActionCommand())){
+			changeRate.setText("Full");
 			changePrice(Globals.FULL);
 			setCurrentPriceLabel();			
 		}else if("half".equals(e.getActionCommand())){
-			current.setText("Half");
+			changeRate.setText("Half");
 			changePrice(Globals.HALF);
 			setCurrentPriceLabel();
 		}else if("free".equals(e.getActionCommand())){
-			current.setText("Free");
+			changeRate.setText("Free");
 			changePrice(Globals.FREE);
 			setCurrentPriceLabel();
 		}
@@ -345,12 +391,17 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		
 		currentPrice = (timeElapsed-savedTime) * priceConstant;		
 		hirePrice = currentPrice+savedPrice;
-		totalPrice = hirePrice + drinkPrice + foodPrice + extraPrice;
+		totalPrice = hirePrice + drinkPrice + foodPrice + extraPrice + membershipPrice;
 		priceLabel.setText(formatter.format(totalPrice));
+		order.updatePrice();
 	}
 
 	public double getHirePrice() {
 		return hirePrice;
+	}
+	
+	public double getMembershipPrice() {
+		return membershipPrice;
 	}
 
 	public double getDrinkPrice() {
