@@ -52,14 +52,14 @@ public class Settings extends JFrame implements ActionListener {
 		price = new JTextField(4);
 		centerBox.add(price);
 
-		layout.putConstraint(SpringLayout.NORTH, numOfTables, 5,
-				SpringLayout.NORTH, centerBox);
-		layout.putConstraint(SpringLayout.NORTH, tables, 5, SpringLayout.NORTH,
-				centerBox);
-		layout.putConstraint(SpringLayout.WEST, numOfTables, 5,
-				SpringLayout.WEST, centerBox);
-		layout.putConstraint(SpringLayout.WEST, tables, 5, SpringLayout.EAST,
-				numOfTables);
+//		layout.putConstraint(SpringLayout.NORTH, numOfTables, 5,
+//				SpringLayout.NORTH, centerBox);
+//		layout.putConstraint(SpringLayout.NORTH, tables, 5, SpringLayout.NORTH,
+//				centerBox);
+//		layout.putConstraint(SpringLayout.WEST, numOfTables, 5,
+//				SpringLayout.WEST, centerBox);
+//		layout.putConstraint(SpringLayout.WEST, tables, 5, SpringLayout.EAST,
+//				numOfTables);
 		layout.putConstraint(SpringLayout.NORTH, pricePH, 5,
 				SpringLayout.SOUTH, numOfTables);
 		layout.putConstraint(SpringLayout.WEST, pricePH, 5, SpringLayout.WEST,
