@@ -209,6 +209,8 @@ public class Main extends JFrame implements ActionListener {
 
 			}
 		});
+		
+		new Scheduler(snookerTableList, poolTableList);
 
 	}
 
@@ -329,6 +331,7 @@ public class Main extends JFrame implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		new Main();
+		
 	}
 
 	/**
