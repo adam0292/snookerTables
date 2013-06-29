@@ -1,32 +1,35 @@
 package snookerTables;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class TimeSlot {
-	private Calendar start, end;
+	private int start, end;
 	private int rate;
 	private Table table;
 	
-	public TimeSlot(Calendar start, Calendar end, int rate, Table table){
+	public TimeSlot(int start, int end, int rate, Table table){
 		this.start = start;
 		this.end = end;
 		this.rate = rate;
+		this.table = table;
 	}
 
-	public Calendar getStart() {
+	public int getStart() {
 		return start;
 	}
 
-	public void setStart(Calendar start) {
+	public void setStart(int start) {
 		this.start = start;
 	}
 
-	public Calendar getEnd() {
+	public int getEnd() {
 		return end;
 	}
 
-	public void setEnd(Calendar end) {
+	public void setEnd(int end) {
 		this.end = end;
 	}
 
@@ -39,7 +42,34 @@ public class TimeSlot {
 	}
 	
 	public String toString(){
-		return "Start time: "+start.getTime()+" End Time: "+end.getTime()+" Rate: "+rate+" Table: ";
+		int startHour = start/60;
+		int startMinute = start%60;
+		String startTime;
+		if(startHour<10){
+			startTime = "0"+startHour;
+		}else{
+			startTime = ""+startHour;
+		}
+		if(startMinute<10){
+			startTime = startTime.concat(":0"+startMinute);
+		}else{
+			startTime = startTime.concat(":"+startMinute);
+		}
+		int endHour = end/60;
+		int endMinute = end%60;
+		String endTime;
+		if(endHour<10){
+			endTime = "0"+endHour;
+		}else{
+			endTime = ""+endHour;
+		}
+		if(startMinute<10){
+			endTime = endTime.concat(":0"+endMinute);
+		}else{
+			endTime = endTime.concat(":"+endMinute);
+		}
+		
+		return "Start time: "+startTime+" End Time: "+endTime+" Rate: "+rate+" Table: "+table.getTableName();
 	}
 
 }

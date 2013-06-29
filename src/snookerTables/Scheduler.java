@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +32,8 @@ public class Scheduler extends JFrame implements ActionListener{
 	private ArrayList<Table> snookerTables, poolTables;
 	private ArrayList<TimeSlot> timeSlots;
 	private JList<String> list;
+	private int startTime;
+	private int endTime;
 	
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables){
 		this.setVisible(true);
@@ -84,11 +88,14 @@ public class Scheduler extends JFrame implements ActionListener{
 		if("add".equals(e.getActionCommand())){
 			for(int i=0; i<tableCheckBoxList.size(); i++){
 				if(tableCheckBoxList.get(i).isSelected()){
-					Calendar start = GregorianCalendar.getInstance();
-					Calendar end = GregorianCalendar.getInstance();
-					start.set(0,0,0,6,0,0);
-					end.set(0,0,0,7,0,0);
-					TimeSlot time = new TimeSlot(start, end, Globals.SNOOKER, snookerTables.get(i));
+//					Calendar start = GregorianCalendar.getInstance();
+//					Calendar end = GregorianCalendar.getInstance();
+//					Date start = new Date();
+					startTime = (60*6+ 30);
+					endTime = (60*7+ 45);
+//					start.set(0,0,0,6,1,0);
+//					end.set(0,0,0,7,0,0);
+					TimeSlot time = new TimeSlot(startTime, endTime, Globals.SNOOKER, snookerTables.get(i));
 					timeSlots.add(time);
 					displayTimes();
 					tableCheckBoxList.get(i).setSelected(false);
