@@ -1,6 +1,7 @@
 package snookerTables;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,15 +12,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerDateModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
 public class Scheduler extends JFrame implements ActionListener{
 	
@@ -34,6 +42,8 @@ public class Scheduler extends JFrame implements ActionListener{
 	private JList<String> list;
 	private int startTime;
 	private int endTime;
+	private JRadioButton full, half, free;
+	private JSpinner startTimeSpinner, endTimeSpinner;
 	
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables){
 		this.setVisible(true);
@@ -70,6 +80,83 @@ public class Scheduler extends JFrame implements ActionListener{
 		list.setVisibleRowCount(-1);
 		bottom.add(list);
 		
+		
+		full = new JRadioButton("Full", true);
+		half = new JRadioButton("Half");
+		free = new JRadioButton("Free");
+		JPanel east = new JPanel();
+		container.add(east, BorderLayout.EAST);
+
+		JPanel timerSpin = new JPanel(new GridLayout(0,1));
+		east.add(timerSpin);
+		
+		startTimeSpinner = new JSpinner( new SpinnerDateModel() );
+		JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(startTimeSpinner, "HH:mm");
+		startTimeSpinner.setEditor(startTimeEditor);
+		startTimeSpinner.setValue(new Date(0));
+
+		timerSpin.add(startTimeSpinner);
+		endTimeSpinner = new JSpinner( new SpinnerDateModel() );
+		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(endTimeSpinner, "HH:mm");
+		endTimeSpinner.setEditor(endTimeEditor);
+		endTimeSpinner.setValue(new Date(0));
+		timerSpin.add(endTimeSpinner);
+
+		startTimeSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				Date startDate = (Date)startTimeSpinner.getValue();
+				Date endDate = (Date)endTimeSpinner.getValue();
+				Calendar calendar = GregorianCalendar.getInstance();
+				calendar.setTime(startDate);
+				startTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+				startTime += calendar.get(Calendar.MINUTE);
+				calendar.setTime(endDate);
+				endTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+				endTime += calendar.get(Calendar.MINUTE);
+				
+				
+			if(startTime>endTime){
+				endTimeSpinner.setValue(startDate);
+			}
+				
+			}
+		});
+		endTimeSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				Date startDate = (Date)startTimeSpinner.getValue();
+				Date endDate = (Date)endTimeSpinner.getValue();
+				Calendar calendar = GregorianCalendar.getInstance();
+				calendar.setTime(startDate);
+				startTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+				startTime += calendar.get(Calendar.MINUTE);
+				calendar.setTime(endDate);
+				endTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+				endTime += calendar.get(Calendar.MINUTE);
+				
+				
+			if(startTime>endTime){
+				startTimeSpinner.setValue(endDate);
+			}
+				
+			}
+			
+		});
+		
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(full);
+		bg.add(half);
+		bg.add(free);
+		
+		JPanel ratePanel = new JPanel();
+		container.add(ratePanel, BorderLayout.NORTH);
+		ratePanel.add(full);
+		ratePanel.add(half);
+		ratePanel.add(free);
+		
 		validate();
 	}
 	
@@ -88,14 +175,26 @@ public class Scheduler extends JFrame implements ActionListener{
 		if("add".equals(e.getActionCommand())){
 			for(int i=0; i<tableCheckBoxList.size(); i++){
 				if(tableCheckBoxList.get(i).isSelected()){
-//					Calendar start = GregorianCalendar.getInstance();
-//					Calendar end = GregorianCalendar.getInstance();
-//					Date start = new Date();
-					startTime = (60*6+ 30);
-					endTime = (60*7+ 45);
-//					start.set(0,0,0,6,1,0);
-//					end.set(0,0,0,7,0,0);
-					TimeSlot time = new TimeSlot(startTime, endTime, Globals.SNOOKER, snookerTables.get(i));
+					
+					
+					int rate;
+					if(full.isSelected()){
+						rate=Globals.FULL;
+					}else if(half.isSelected()){
+						rate=Globals.HALF;
+					}else{
+						rate=Globals.FREE;
+					}
+					Date startDate = (Date)startTimeSpinner.getValue();
+					Date endDate = (Date)endTimeSpinner.getValue();
+					Calendar calendar = GregorianCalendar.getInstance();
+					calendar.setTime(startDate);
+					startTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+					startTime += calendar.get(Calendar.MINUTE);
+					calendar.setTime(endDate);
+					endTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
+					endTime += calendar.get(Calendar.MINUTE);
+					TimeSlot time = new TimeSlot(startTime, endTime,rate, Globals.SNOOKER, snookerTables.get(i));
 					timeSlots.add(time);
 					displayTimes();
 					tableCheckBoxList.get(i).setSelected(false);

@@ -10,7 +10,7 @@ public class TimeSlot {
 	private int rate;
 	private Table table;
 	
-	public TimeSlot(int start, int end, int rate, Table table){
+	public TimeSlot(int start, int end, int rate, int type, Table table){
 		this.start = start;
 		this.end = end;
 		this.rate = rate;
