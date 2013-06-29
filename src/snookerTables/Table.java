@@ -195,7 +195,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		extra.addActionListener(this);
 		extraPopup.add(extra);
 		
-		JMenuItem membership = new JMenuItem("Membersjip");
+		JMenuItem membership = new JMenuItem("Membership");
 		membership.setActionCommand("membership");
 		membership.addActionListener(this);
 		extraPopup.add(membership);
