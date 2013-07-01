@@ -199,6 +199,10 @@ public class Scheduler extends JFrame implements ActionListener{
 		createTableTabs();
 		outermain.add(tableTab);
 		
+		
+		CheckScheduler checker = new CheckScheduler(this);
+		new Thread(checker).start();
+		
 		validate();
 	}
 	
