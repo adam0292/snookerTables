@@ -7,14 +7,32 @@ import java.util.Date;
 
 public class TimeSlot {
 	private int start, end;
+	private boolean[] dayOfWeek;
 	private int rate;
 	private Table table;
 	
-	public TimeSlot(int start, int end, int rate, int type, Table table){
+	public TimeSlot(int start, int end, boolean[] dayOfWeek, int rate, int type, Table table){
 		this.start = start;
 		this.end = end;
 		this.rate = rate;
 		this.table = table;
+		this.dayOfWeek = dayOfWeek;
+	}
+
+	public Table getTable() {
+		return table;
+	}
+
+	public void setTable(Table table) {
+		this.table = table;
+	}
+
+	public boolean[] getDayOfWeek() {
+		return dayOfWeek;
+	}
+
+	public void setDayOfWeek(boolean[] dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
 	}
 
 	public int getStart() {
@@ -68,8 +86,12 @@ public class TimeSlot {
 		}else{
 			endTime = endTime.concat(":"+endMinute);
 		}
-		
-		return "Start time: "+startTime+" End Time: "+endTime+" Rate: "+rate+" Table: "+table.getTableName();
+		String days="";
+		for(int i=0; i<dayOfWeek.length; i++){
+			if(dayOfWeek[i]==true){
+				days = days.concat(""+i);
+			}
+		}
+		return "Start time: "+startTime+" End Time: "+endTime+" Rate: "+Globals.getRate(rate);
 	}
-
 }

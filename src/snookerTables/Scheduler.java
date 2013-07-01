@@ -18,15 +18,18 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.SliderUI;
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
 public class Scheduler extends JFrame implements ActionListener{
@@ -35,60 +38,94 @@ public class Scheduler extends JFrame implements ActionListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel container, main;
-	private ArrayList<JCheckBox> tableCheckBoxList;
+	private JPanel container, main,tableChecks;
+	private ArrayList<JCheckBox> tableCheckBoxList, weekDayCheckBoxList;
 	private ArrayList<Table> snookerTables, poolTables;
 	private ArrayList<TimeSlot> timeSlots;
-	private JList<String> list;
+	private ArrayList<JPanel> weekPanels;
+	private ArrayList<JTabbedPane> tablePanels;
+	private JList<String>[][] lists;
 	private int startTime;
 	private int endTime;
+	private JPanel[][] schecdPane;;
 	private JRadioButton full, half, free;
 	private JSpinner startTimeSpinner, endTimeSpinner;
+	private JTabbedPane tableTab, weekTab;
 	
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables){
 		this.setVisible(true);
-		this.setSize(300, 300);
+		this.setSize(700, 300);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		container = new JPanel(new BorderLayout());
 		this.add(container);
 		tableCheckBoxList = new ArrayList<JCheckBox>();
-		
+		weekDayCheckBoxList = new ArrayList<JCheckBox>();
+		tablePanels = new ArrayList<JTabbedPane>();
 		timeSlots = new ArrayList<TimeSlot>();
+//		lists = new ArrayList<JList<String>>();
 		
 		this.snookerTables=snookerTables;
 		this.poolTables=poolTables;
-		main = new JPanel();
-		container.add(main, BorderLayout.CENTER);
+		main = new JPanel(new BorderLayout());
+		
+		JPanel checkboxes = new JPanel(new GridLayout(0,1));
+		main.add(checkboxes, BorderLayout.CENTER);
+		JPanel outermain = new JPanel(new GridLayout(0,1));
+		outermain.add(main);
+		container.add(outermain, BorderLayout.CENTER);
 		JButton add = new JButton("Add");
 		add.setActionCommand("add");
 		add.addActionListener(this);
-		main.add(add);
+		main.add(add, BorderLayout.SOUTH);
 		JPanel bottom = new JPanel();
 		container.add(bottom, BorderLayout.SOUTH);
+		tableChecks = new JPanel(new GridLayout(3,0));
 		createTablesCheckboxes();
-		list = new JList<String>();
-		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		ListSelectionModel selectionModel = list.getSelectionModel();
-		selectionModel.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-			}
-		});
-//		list.setLayoutOrientation(JList.VERTICAL_WRAP);
-		list.setVisibleRowCount(-1);
-		bottom.add(list);
+		checkboxes.add(tableChecks, BorderLayout.CENTER);
+//		list = new JList<String>();
+//		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+//		ListSelectionModel selectionModel = list.getSelectionModel();
+//		selectionModel.addListSelectionListener(new ListSelectionListener() {
+//			
+//			@Override
+//			public void valueChanged(ListSelectionEvent e) {
+//				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+//			}
+//		});
+////		list.setLayoutOrientation(JList.VERTICAL_WRAP);
+//		list.setVisibleRowCount(-1);
+//		bottom.add(list);
+		
 		
 		
 		full = new JRadioButton("Full", true);
 		half = new JRadioButton("Half");
 		free = new JRadioButton("Free");
-		JPanel east = new JPanel();
-		container.add(east, BorderLayout.EAST);
-
+		JPanel timePanel = new JPanel();
+		container.add(timePanel, BorderLayout.EAST);
+		
+		JCheckBox monday = new JCheckBox("Monday");
+		JCheckBox tuesday = new JCheckBox("Tuesday");
+		JCheckBox wednesday = new JCheckBox("Wednesday");
+		JCheckBox thursday = new JCheckBox("Thursday");
+		JCheckBox friday = new JCheckBox("Friday");
+		JCheckBox saturday = new JCheckBox("Saturday");
+		JCheckBox sunday = new JCheckBox("Sunday");
+		weekDayCheckBoxList.add(sunday);
+		weekDayCheckBoxList.add(monday);
+		weekDayCheckBoxList.add(tuesday);
+		weekDayCheckBoxList.add(wednesday);
+		weekDayCheckBoxList.add(thursday);
+		weekDayCheckBoxList.add(friday);
+		weekDayCheckBoxList.add(saturday);
+		JPanel weekPanel = new JPanel(new GridLayout(0,3));
+		for(int i=0; i<weekDayCheckBoxList.size(); i++){
+			weekPanel.add(weekDayCheckBoxList.get(i));
+		}
+		checkboxes.add(weekPanel, BorderLayout.SOUTH);
+		
 		JPanel timerSpin = new JPanel(new GridLayout(0,1));
-		east.add(timerSpin);
+		timePanel.add(timerSpin);
 		
 		startTimeSpinner = new JSpinner( new SpinnerDateModel() );
 		JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(startTimeSpinner, "HH:mm");
@@ -146,10 +183,11 @@ public class Scheduler extends JFrame implements ActionListener{
 			
 		});
 		
-		ButtonGroup bg = new ButtonGroup();
-		bg.add(full);
-		bg.add(half);
-		bg.add(free);
+		ButtonGroup bgRate = new ButtonGroup();
+		bgRate.add(full);
+		bgRate.add(half);
+		bgRate.add(free);
+
 		
 		JPanel ratePanel = new JPanel();
 		container.add(ratePanel, BorderLayout.NORTH);
@@ -157,7 +195,83 @@ public class Scheduler extends JFrame implements ActionListener{
 		ratePanel.add(half);
 		ratePanel.add(free);
 		
+		tableTab = new JTabbedPane();
+		createTableTabs();
+		outermain.add(tableTab);
+		
 		validate();
+	}
+	
+	private boolean checkOverlap(TimeSlot newSlot){
+		boolean[] newWeekday = newSlot.getDayOfWeek();
+		int newStartTime = newSlot.getStart();
+		int newEndTime = newSlot.getEnd();
+		if(newStartTime==newEndTime){
+			return false;
+		}
+		for(int i=0; i<newWeekday.length; i++){
+			for(int j=0; j<timeSlots.size(); j++){
+				if(newSlot.getDayOfWeek()[i]==true&&timeSlots.get(j).getDayOfWeek()[i]==true&&(newSlot.getTable().equals(timeSlots.get(j).getTable()))){
+					if(newStartTime>=timeSlots.get(j).getStart()){
+						if(timeSlots.get(j).getEnd()>newStartTime){
+							return false;
+						}
+					}
+					if(newEndTime<=timeSlots.get(j).getEnd()){
+						if(timeSlots.get(j).getStart()<newEndTime){
+							return false;
+						}
+					}
+					if(newStartTime<timeSlots.get(j).getStart()&&newEndTime>timeSlots.get(j).getEnd()){
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	private void createTableTabs(){
+		schecdPane = new JPanel[Globals.NUMSNOOKERTABLES][7];
+		lists = new JList[Globals.NUMSNOOKERTABLES][7];
+		
+		for(int i=0; i<Globals.NUMSNOOKERTABLES; i++){
+			JTabbedPane table = new JTabbedPane();
+			tablePanels.add(table);
+			tableTab.add("Table "+(i+1), table);
+		}
+		for(int i=0; i<tablePanels.size(); i++){
+			for(int j=0; j<7; j++){
+			schecdPane[i][j] = new JPanel();
+			
+			JList<String> list = new JList<String>();
+			list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+			ListSelectionModel selectionModel = list.getSelectionModel();
+			selectionModel.addListSelectionListener(new ListSelectionListener() {
+				
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				}
+			});
+//			list.setLayoutOrientation(JList.VERTICAL_WRAP);
+			list.setVisibleRowCount(-1);
+			lists[i][j]=list;
+			schecdPane[i][j].add(list);
+			}
+		}
+			for(int i=0; i<Globals.NUMSNOOKERTABLES; i++){
+				for(int j=0; j<7; j++){
+					tablePanels.get(i).add(Globals.getDayName(j), schecdPane[i][j]);
+				}
+			}
+			
+			
+			
+			
+
+			
+		
 	}
 	
 	private void createTablesCheckboxes(){
@@ -166,17 +280,28 @@ public class Scheduler extends JFrame implements ActionListener{
 		tableCheckBoxList.add(check);
 //		check.setActionCommand("table"+(i+1));
 //		check.addActionListener(this);
-		main.add(check);
+		tableChecks.add(check);
 		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if("add".equals(e.getActionCommand())){
+			boolean tableSelected=false;
+			boolean daySelected=false;
 			for(int i=0; i<tableCheckBoxList.size(); i++){
 				if(tableCheckBoxList.get(i).isSelected()){
-					
-					
+					tableSelected=true;
+					boolean[] weekDays = new boolean[7];
+					for(int j=0; j<7; j++){
+						if(weekDayCheckBoxList.get(j).isSelected()){
+							daySelected=true;
+						}
+							weekDays[j]=weekDayCheckBoxList.get(j).isSelected();
+							
+							
+					}
+					if(daySelected){
 					int rate;
 					if(full.isSelected()){
 						rate=Globals.FULL;
@@ -194,23 +319,56 @@ public class Scheduler extends JFrame implements ActionListener{
 					calendar.setTime(endDate);
 					endTime = calendar.get(Calendar.HOUR_OF_DAY)*60;
 					endTime += calendar.get(Calendar.MINUTE);
-					TimeSlot time = new TimeSlot(startTime, endTime,rate, Globals.SNOOKER, snookerTables.get(i));
+					
+					calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+					TimeSlot time = new TimeSlot(startTime, endTime, weekDays,rate, Globals.SNOOKER, snookerTables.get(i));
+					if(checkOverlap(time)){
 					timeSlots.add(time);
 					displayTimes();
-					tableCheckBoxList.get(i).setSelected(false);
+					}else{
+						JOptionPane.showMessageDialog(this, "Overlap Error");
+						break;
+					}
+//					tableCheckBoxList.get(i).setSelected(false);
+					
+					}else{
+						JOptionPane.showMessageDialog(this, "Choose at least one day");
+					}
+					
 				}
 			}
+			if(!tableSelected){
+				JOptionPane.showMessageDialog(this, "Choose at least one table");
+			}
 		}
+//		for(int j=0; j<7; j++){
+//			weekDayCheckBoxList.get(j).setSelected(false);
+//		}
 		
 	}
 	
 	private void displayTimes(){
 		
-		DefaultListModel<String> listModel = new DefaultListModel<String>();
-		for(int i=0; i<timeSlots.size(); i++){
-			listModel.addElement(timeSlots.get(i).toString());
+		
+		for(int i=0; i<tablePanels.size(); i++){
+			
+			for(int k=0; k<7; k++){
+				DefaultListModel<String> listModel = new DefaultListModel<String>();
+			for(int j=0; j<timeSlots.size(); j++){
+				if(timeSlots.get(j).getTable().equals(snookerTables.get(i))){
+						if(timeSlots.get(j).getDayOfWeek()[k]){
+							listModel.addElement(timeSlots.get(j).toString());
+						}
+				}
+			}
+			
+			lists[i][k].setModel(listModel);
+			}
+			
 		}
-		list.setModel(listModel);
+//		DefaultListModel<String> listModel = new DefaultListModel<String>();
+//		listModel.addElement("Test");
+//		lists.get(0).setModel(listModel);
 		validate();
 	}
 

@@ -12,6 +12,7 @@ public class Timer implements Runnable{
 	boolean running = false, clock;
     int min = 0;
     int hr = 0;
+    int schedUpdate;
     float sec = 0;
     
 	public Timer(Table table){
@@ -84,6 +85,11 @@ public class Timer implements Runnable{
             table.getOrder().updatePrice();
             }else{
             	main.setClock();
+            	schedUpdate+=1;
+            	if(schedUpdate==100){
+            		main.checkSchedule();
+            		schedUpdate=0;
+            	}
             }
         }
     }

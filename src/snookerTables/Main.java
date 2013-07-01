@@ -333,6 +333,10 @@ public class Main extends JFrame implements ActionListener {
 		new Main();
 		
 	}
+	
+	public void checkSchedule(){
+		System.out.println("Test");
+	}
 
 	/**
 	 * Method called when an action is performed
