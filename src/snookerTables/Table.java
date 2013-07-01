@@ -258,7 +258,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 				changeBackground(new Color(220, 20, 60));
 				start.setText("Start");
 				start.setActionCommand("start");
-				current.setText("Full");
+				changeRate.setText("Full");
 				changePrice(Globals.FULL);
 				setCurrentPriceLabel();	
 			}
