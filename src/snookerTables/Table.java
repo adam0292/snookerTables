@@ -76,7 +76,8 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		Dimension dimension = toolkit.getScreenSize();
 		int height = dimension.height;
 		int width = dimension.width;
-		this.setPreferredSize(new Dimension(width / 2 / 3, (height - 200) / 3));
+//		this.setPreferredSize(new Dimension(width / 2 / 3, (height - 200) / 3));
+		this.setPreferredSize(new Dimension(205, 200));
 
 		JLabel name = new JLabel(tableName, JLabel.CENTER);
 		name.setFont(new Font(null, Font.BOLD, 15));

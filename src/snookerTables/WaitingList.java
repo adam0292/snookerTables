@@ -61,8 +61,10 @@ public class WaitingList extends JPanel implements ActionListener {
 		Dimension dimension = toolkit.getScreenSize();
 		int height = dimension.height;
 		int width = dimension.width;
-		this.setSize(width/5,(int)(height/2.5));
-		setPreferredSize(new Dimension(width/5,(int)(height/2.5)));
+//		this.setSize(width/5,(int)(height/2.5));
+//		setPreferredSize(new Dimension(width/5,(int)(height/2.5)));
+		this.setSize(200,300);
+		setPreferredSize(new Dimension(220, 300));
 		waiting = new ArrayList<String>();
 		selected = new ArrayList<Integer>();
 		list = new JList<String>();
