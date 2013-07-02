@@ -269,13 +269,13 @@ public class Main extends JFrame implements ActionListener {
 	public void addTables(int numSnookerTables, int numPoolTables) {
 		// Creates the snooker tables
 		for (int i = 0; i < numSnookerTables; i++) { // adds the snooker tables
-			Table table = new Table("Table " + (i + 1), Globals.SNOOKER, this);
+			Table table = new Table((i + 1), Globals.SNOOKER, this);
 			snookerTables.add(table);
 			snookerTableList.add(table);
 		}
 		// Creates the pool tables
 		for (int i = 0; i < numPoolTables; i++) { // adds the snooker tables
-			Table table = new Table("Table " + (i), Globals.POOL, this);
+			Table table = new Table((i), Globals.POOL, this);
 			poolTables.add(table);
 			poolTableList.add(table);
 		}

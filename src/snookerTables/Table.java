@@ -24,6 +24,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private static final long serialVersionUID = 1L;
 	private TableOrder order;
 	private Timer stopWatch = new Timer(this);
+	private int rate;
 	private String tableTime = "0:0:0", tableName;
 	private double hirePrice = 0.00, priceConstant,
 			drinkPrice, foodPrice, extraPrice, totalPrice, fullPrice, savedPrice, currentPrice, membershipPrice;
@@ -38,6 +39,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	private int timeElapsed;
 	private int type, savedTime;
 	private JMenu current;
+	private int tableNumber;
 
 	/** Stroke size. it is recommended to set it to 1 for better view */
 	protected int strokeSize = 1;
@@ -56,13 +58,14 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	/** The transparency value of shadow. ( 0 - 255) */
 	protected int shadowAlpha = 150;
 
-	public Table(String tableName, int type, Main main) {
+	public Table(int tableNumber, int type, Main main) {
 		super();
 		setOpaque(false);
 
 		this.type = type;
 		this.main = main;
-		this.tableName = tableName;
+		this.tableName = "Table "+tableNumber;
+		this.tableNumber = tableNumber;
 		order = new TableOrder(this);
 		// this.setLayout(new BorderLayout());
 		container = new JPanel(new BorderLayout());
@@ -310,39 +313,52 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 				}
 			}
 			}else if("full".equals(e.getActionCommand())){
-			changeRate.setText("Full");
+			
 			changePrice(Globals.FULL);
-			setCurrentPriceLabel();			
+					
 		}else if("half".equals(e.getActionCommand())){
-			changeRate.setText("Half");
+			
 			changePrice(Globals.HALF);
-			setCurrentPriceLabel();
+
 		}else if("free".equals(e.getActionCommand())){
-			changeRate.setText("Free");
+			
 			changePrice(Globals.FREE);
-			setCurrentPriceLabel();
+
 		}
 		main.resizeTables();
 
 	}
+
+	public int getRate(){
+		return rate;
+	}
 	
-	private void changePrice(int level){
+	public JButton getRateButton(){
+		return changeRate;
+	}
+	
+	public void changePrice(int level){
+		rate = level;
 		if(level==Globals.FULL){
+			changeRate.setText("Full");
 			priceConstant=fullPrice;
 			savedPrice = savedPrice + currentPrice;
 			currentPrice=0;
 			savedTime = timeElapsed;
 		}else if(level==Globals.HALF){
+			changeRate.setText("Half");
 			priceConstant=fullPrice/2;
 			savedPrice = savedPrice + currentPrice;
 			currentPrice=0;
 			savedTime = timeElapsed;
 		}else if(level==Globals.FREE){
+			changeRate.setText("Free");
 			priceConstant=0;
 			savedPrice = savedPrice + currentPrice;
 			currentPrice=0;
 			savedTime = timeElapsed;
 		}
+		setCurrentPriceLabel();	
 		
 	}
 
@@ -354,6 +370,9 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		currentPriceLabel.setText(formatter.format(priceConstant*3600));
 	}
 	
+	public int getTableNumber(){
+		return tableNumber;
+	}
 	private void setHireCost(){
 		//read in hireCosts
 		if(type==Globals.SNOOKER){

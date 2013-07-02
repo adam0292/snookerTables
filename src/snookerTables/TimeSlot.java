@@ -10,6 +10,7 @@ public class TimeSlot {
 	private boolean[] dayOfWeek;
 	private int rate;
 	private Table table;
+	private boolean active;
 	
 	public TimeSlot(int start, int end, boolean[] dayOfWeek, int rate, int type, Table table){
 		this.start = start;
@@ -17,10 +18,19 @@ public class TimeSlot {
 		this.rate = rate;
 		this.table = table;
 		this.dayOfWeek = dayOfWeek;
+		active=false;
 	}
 
 	public Table getTable() {
 		return table;
+	}
+	
+	public boolean getActive(){
+		return active;
+	}
+	
+	public void setActive(boolean active){
+		this.active=active;
 	}
 
 	public void setTable(Table table) {
