@@ -147,7 +147,7 @@ public class Scheduler extends JFrame implements ActionListener {
 		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(
 				endTimeSpinner, "HH:mm");
 		endTimeSpinner.setEditor(endTimeEditor);
-		endTimeSpinner.setValue(new Date(0));
+		endTimeSpinner.setValue(new Date(60*60*1000));
 		timerSpin.add(endTimeSpinner);
 
 		startTimeSpinner.addChangeListener(new ChangeListener() {
