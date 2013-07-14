@@ -12,6 +12,8 @@ public class Globals {
 	static final int NUMSNOOKERTABLES=9;
 	static final int NUMPOOLTABLES=1;
 	
+	static int ID = 0;
+	
 	public static String getRate(int rateIndex){
 		if(rateIndex==0){
 			return "Full";

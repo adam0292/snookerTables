@@ -11,18 +11,25 @@ public class TimeSlot {
 	private int rate;
 	private Table table;
 	private boolean active;
+	private int id;
 	
-	public TimeSlot(int start, int end, boolean[] dayOfWeek, int rate, int type, Table table){
+	public TimeSlot(int id, int start, int end, boolean[] dayOfWeek, int rate, int type, Table table){
 		this.start = start;
 		this.end = end;
 		this.rate = rate;
 		this.table = table;
-		this.dayOfWeek = dayOfWeek;
+		this.dayOfWeek = dayOfWeek; 
+		this.id = id;
 		active=false;
+		Globals.ID++;
 	}
 
 	public Table getTable() {
 		return table;
+	}
+
+	public int getID(){
+		return id;
 	}
 	
 	public boolean getActive(){

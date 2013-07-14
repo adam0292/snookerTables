@@ -5,6 +5,12 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,6 +60,8 @@ public class Scheduler extends JFrame implements ActionListener {
 	private JSpinner startTimeSpinner, endTimeSpinner;
 	private JTabbedPane tableTab;
 	private DefaultListModel<String>[][] dListModel;
+	private BufferedReader br;
+	private File file;
 
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables) {
 		this.setVisible(true);
@@ -147,7 +155,7 @@ public class Scheduler extends JFrame implements ActionListener {
 		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(
 				endTimeSpinner, "HH:mm");
 		endTimeSpinner.setEditor(endTimeEditor);
-		endTimeSpinner.setValue(new Date(60*60*1000));
+		endTimeSpinner.setValue(new Date(60 * 60 * 1000));
 		timerSpin.add(endTimeSpinner);
 
 		startTimeSpinner.addChangeListener(new ChangeListener() {
@@ -209,6 +217,25 @@ public class Scheduler extends JFrame implements ActionListener {
 
 		CheckScheduler checker = new CheckScheduler(this);
 		new Thread(checker).start();
+
+		try {
+
+			file = new File("scheduler.config");
+			// if file doesn't exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			FileReader fr = new FileReader(file.getAbsoluteFile());
+			br = new BufferedReader(fr);
+			loadScheduler();
+			
+			
+
+		} catch (IOException ex) {
+
+		}
+
 
 		validate();
 	}
@@ -302,63 +329,7 @@ public class Scheduler extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("add".equals(e.getActionCommand())) {
-			boolean tableSelected = false;
-			boolean daySelected = false;
-			for (int i = 0; i < tableCheckBoxList.size(); i++) {
-				if (tableCheckBoxList.get(i).isSelected()) {
-					tableSelected = true;
-					boolean[] weekDays = new boolean[7];
-					for (int j = 0; j < 7; j++) {
-						if (weekDayCheckBoxList.get(j).isSelected()) {
-							daySelected = true;
-						}
-						weekDays[j] = weekDayCheckBoxList.get(j).isSelected();
-
-					}
-					if (daySelected) {
-						int rate;
-						if (full.isSelected()) {
-							rate = Globals.FULL;
-						} else if (half.isSelected()) {
-							rate = Globals.HALF;
-						} else {
-							rate = Globals.FREE;
-						}
-						Date startDate = (Date) startTimeSpinner.getValue();
-						Date endDate = (Date) endTimeSpinner.getValue();
-						Calendar calendar = GregorianCalendar.getInstance();
-						calendar.setTime(startDate);
-						startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-						startTime += calendar.get(Calendar.MINUTE);
-						calendar.setTime(endDate);
-						endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-						endTime += calendar.get(Calendar.MINUTE);
-
-						calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-						TimeSlot time = new TimeSlot(startTime, endTime,
-								weekDays, rate, Globals.SNOOKER,
-								snookerTables.get(i));
-						if (checkOverlap(time)) {
-							timeSlots.add(time);
-							displayTimes();
-						} else {
-							JOptionPane
-									.showMessageDialog(this, "Overlap Error");
-							break;
-						}
-						// tableCheckBoxList.get(i).setSelected(false);
-
-					} else {
-						JOptionPane.showMessageDialog(this,
-								"Choose at least one day");
-					}
-
-				}
-			}
-			if (!tableSelected) {
-				JOptionPane
-						.showMessageDialog(this, "Choose at least one table");
-			}
+			addEvent();
 		} else if ("remove".equals(e.getActionCommand())) {
 			removeEvent();
 		}
@@ -366,6 +337,98 @@ public class Scheduler extends JFrame implements ActionListener {
 		// weekDayCheckBoxList.get(j).setSelected(false);
 		// }
 
+	}
+
+	private void addEvent() {
+		boolean tableSelected = false;
+		boolean daySelected = false;
+		for (int i = 0; i < tableCheckBoxList.size(); i++) {
+			if (tableCheckBoxList.get(i).isSelected()) {
+				tableSelected = true;
+				boolean[] weekDays = new boolean[7];
+				for (int j = 0; j < 7; j++) {
+					if (weekDayCheckBoxList.get(j).isSelected()) {
+						daySelected = true;
+					}
+					weekDays[j] = weekDayCheckBoxList.get(j).isSelected();
+
+				}
+				if (daySelected) {
+					int rate;
+					if (full.isSelected()) {
+						rate = Globals.FULL;
+					} else if (half.isSelected()) {
+						rate = Globals.HALF;
+					} else {
+						rate = Globals.FREE;
+					}
+					Date startDate = (Date) startTimeSpinner.getValue();
+					Date endDate = (Date) endTimeSpinner.getValue();
+					Calendar calendar = GregorianCalendar.getInstance();
+					calendar.setTime(startDate);
+					startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+					startTime += calendar.get(Calendar.MINUTE);
+					calendar.setTime(endDate);
+					endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+					endTime += calendar.get(Calendar.MINUTE);
+
+					calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+					TimeSlot time = new TimeSlot(Globals.ID, startTime,
+							endTime, weekDays, rate, Globals.SNOOKER,
+							snookerTables.get(i));
+					if (checkOverlap(time)) {
+						timeSlots.add(time);
+						writeConfig();
+						displayTimes();
+					} else {
+						JOptionPane.showMessageDialog(this, "Overlap Error");
+						break;
+					}
+					// tableCheckBoxList.get(i).setSelected(false);
+
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"Choose at least one day");
+				}
+
+			}
+		}
+		if (!tableSelected) {
+			JOptionPane.showMessageDialog(this, "Choose at least one table");
+		}
+	}
+
+	private void writeConfig() {
+		FileWriter fw;
+		try {
+			fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+		for (int i = 0; i < timeSlots.size(); i++) {
+			try {
+				bw.write("//EVENT START\n");
+				bw.write(timeSlots.get(i).getID() + "\n");
+				bw.write(timeSlots.get(i).getStart() + "\n");
+				bw.write(timeSlots.get(i).getEnd() + "\n");
+				for (int j = 0; j < timeSlots.get(i).getDayOfWeek().length; j++) {
+					if (timeSlots.get(i).getDayOfWeek()[j]) {
+						bw.write(j + "-");
+					}
+				}
+				bw.write("\n" + timeSlots.get(i).getRate() + "\n");
+				bw.write(Globals.SNOOKER + "\n");
+				bw.write(timeSlots.get(i).getTable().getTableNumber() + "\n");
+				bw.write("//EVENT END\n");
+				bw.flush();
+			} catch (IOException ex) {
+
+			}
+			
+		}	
+		fw.close();
+		bw.close();
+		} catch (IOException e) {
+		}
+		
 	}
 
 	private void removeEvent() {
@@ -382,17 +445,20 @@ public class Scheduler extends JFrame implements ActionListener {
 				}
 			}
 		}
-		if(lists[table][day].getSelectedIndex()!=-1){
-		int[] selected = lists[table][day].getSelectedIndices();
-		for (int i = selected.length-1; i >= 0; i--) {
-			for (int j = 0; j < timeSlots.size(); j++) {
-				if (dListModel[table][day].get(i).equals(timeSlots.get(j).toString())) {
-					timeSlots.remove(j);
+		if (lists[table][day].getSelectedIndex() != -1) {
+			int[] selected = lists[table][day].getSelectedIndices();
+			for (int i = selected.length - 1; i >= 0; i--) {
+				for (int j = 0; j < timeSlots.size(); j++) {
+					if (dListModel[table][day].get(i).equals(
+							timeSlots.get(j).toString())) {
+						timeSlots.remove(j);
+						writeConfig();
+					}
 				}
+
+				dListModel[table][day].remove(selected[i]);
 			}
-			dListModel[table][day].remove(selected[i]);
-		}
-		lists[table][day].setModel(dListModel[table][day]);
+			lists[table][day].setModel(dListModel[table][day]);
 		}
 	}
 
@@ -424,6 +490,32 @@ public class Scheduler extends JFrame implements ActionListener {
 
 	public ArrayList<TimeSlot> getTimeSlots() {
 		return timeSlots;
+	}
+
+	public void loadScheduler() {
+		try {
+			
+			while (br.readLine() != null) {
+				int id = Integer.parseInt(br.readLine());
+				int startT = Integer.parseInt(br.readLine());
+				int endT = Integer.parseInt(br.readLine());
+				String[] weekDS = br.readLine().split("-");
+				boolean[] weekD = new boolean[7];
+				for (int i = 0; i < weekDS.length; i++) {
+					weekD[Integer.parseInt(weekDS[i])] = true;
+				}
+				int rate = Integer.parseInt(br.readLine());
+				int type = Integer.parseInt(br.readLine());
+				int tableNum = Integer.parseInt(br.readLine()) - 1;
+				br.readLine();
+				TimeSlot time = new TimeSlot(id, startT, endT, weekD, rate,
+						type, snookerTables.get(tableNum));
+				timeSlots.add(time);
+				displayTimes();
+			}
+		} catch (IOException ex) {
+
+		}
 	}
 
 }
