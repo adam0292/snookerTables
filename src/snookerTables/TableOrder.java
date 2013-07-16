@@ -115,7 +115,7 @@ public class TableOrder extends JPanel implements ActionListener{
 		double membershipPrice = table.getMembershipPrice();
 		membershipPriceLabel.setText("Membership Cost: "+formatter.format(membershipPrice));
 		
-		double totalPrice = hirePrice+drinkPrice+foodPrice+extraPrice;
+		double totalPrice = hirePrice+drinkPrice+foodPrice+extraPrice+membershipPrice;
 		totalPriceLabel.setText("Total: "+formatter.format(totalPrice));
 		
 		

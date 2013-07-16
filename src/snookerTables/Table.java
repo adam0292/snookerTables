@@ -252,6 +252,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 				drinkPrice = 0;
 				foodPrice = 0;
 				extraPrice = 0;
+				membershipPrice=0;
 				totalPrice = 0;
 				savedTime = 0;
 				savedPrice = 0;
