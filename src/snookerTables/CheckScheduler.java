@@ -20,8 +20,8 @@ public class CheckScheduler implements Runnable {
 	public CheckScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
 		calendar = GregorianCalendar.getInstance();
-		current = new TimeSlot[Globals.NUMSNOOKERTABLES];
-		manual= new int[Globals.NUMSNOOKERTABLES];
+		current = new TimeSlot[10];
+		manual= new int[10];
 		for(int i=0; i<manual.length; i++){
 			manual[i]=-1;
 		}
@@ -32,6 +32,11 @@ public class CheckScheduler implements Runnable {
 		running = true;
 		while (running) {
 			calendar.setTime(new Date());
+			int mins = calendar.get(Calendar.SECOND);
+			if(mins==15||mins==30||mins==45||mins==00){
+			
+			boolean[] stillActive = new boolean[10];
+
 			timeSlots = scheduler.getTimeSlots();
 			dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
 			for (int i = 0; i < timeSlots.size(); i++) {
@@ -42,6 +47,7 @@ public class CheckScheduler implements Runnable {
 							&& timeSlots.get(i).getEnd() > (calendar
 									.get(Calendar.HOUR_OF_DAY) * 60 + calendar
 									.get(Calendar.MINUTE))) {
+						stillActive[timeSlots.get(i).getTable().getTableNumber()]=true;
 						if (timeSlots.get(i).getActive()) {
 							if(manual[timeSlots.get(i).getTable().getTableNumber()]==timeSlots.get(i).getTable().getRate()){
 							}else{
@@ -64,8 +70,14 @@ public class CheckScheduler implements Runnable {
 					}
 				}
 			}
+			for(int i=0; i<stillActive.length; i++){
+				if(stillActive[i]==false){
+					scheduler.getTables().get(i).changePrice(Globals.FULL);
+				}
+			}
+			}
 			try {
-				Thread.sleep(60000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
 

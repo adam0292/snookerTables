@@ -19,9 +19,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -47,7 +49,15 @@ public class Scheduler extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel container, main, tableChecks;
 	private ArrayList<JCheckBox> tableCheckBoxList, weekDayCheckBoxList;
-	private ArrayList<Table> snookerTables, poolTables;
+	private ArrayList<Table> tables;
+	public ArrayList<Table> getTables() {
+		return tables;
+	}
+
+//	public ArrayList<Table> getPoolTables() {
+//		return poolTables;
+//	}
+
 	private ArrayList<TimeSlot> timeSlots;
 	private ArrayList<JPanel> weekPanels;
 	private ArrayList<JTabbedPane> tablePanels;
@@ -62,6 +72,7 @@ public class Scheduler extends JFrame implements ActionListener {
 	private DefaultListModel<String>[][] dListModel;
 	private BufferedReader br;
 	private File file;
+	private JComboBox<String> startMinCombo, startHourCombo, endMinCombo, endHourCombo;
 
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables) {
 		this.setVisible(true);
@@ -73,10 +84,12 @@ public class Scheduler extends JFrame implements ActionListener {
 		weekDayCheckBoxList = new ArrayList<JCheckBox>();
 		tablePanels = new ArrayList<JTabbedPane>();
 		timeSlots = new ArrayList<TimeSlot>();
-		dListModel = new DefaultListModel[Globals.NUMSNOOKERTABLES][7];
+		dListModel = new DefaultListModel[10][7];
 
-		this.snookerTables = snookerTables;
-		this.poolTables = poolTables;
+		tables = poolTables;
+		for(int i=0; i<snookerTables.size(); i++){
+			tables.add(snookerTables.get(i));
+		}
 		main = new JPanel(new BorderLayout());
 
 		JPanel checkboxes = new JPanel(new GridLayout(0, 1));
@@ -115,8 +128,8 @@ public class Scheduler extends JFrame implements ActionListener {
 		// list.setVisibleRowCount(-1);
 		// bottom.add(list);
 
-		full = new JRadioButton("Full", true);
-		half = new JRadioButton("Half");
+		full = new JRadioButton("Full");
+		half = new JRadioButton("Half", true);
 		free = new JRadioButton("Free");
 		JPanel timePanel = new JPanel();
 		container.add(timePanel, BorderLayout.EAST);
@@ -141,64 +154,176 @@ public class Scheduler extends JFrame implements ActionListener {
 		}
 		checkboxes.add(weekPanel, BorderLayout.SOUTH);
 
-		JPanel timerSpin = new JPanel(new GridLayout(0, 1));
-		timePanel.add(timerSpin);
-
-		startTimeSpinner = new JSpinner(new SpinnerDateModel());
-		JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(
-				startTimeSpinner, "HH:mm");
-		startTimeSpinner.setEditor(startTimeEditor);
-		startTimeSpinner.setValue(new Date(0));
-
-		timerSpin.add(startTimeSpinner);
-		endTimeSpinner = new JSpinner(new SpinnerDateModel());
-		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(
-				endTimeSpinner, "HH:mm");
-		endTimeSpinner.setEditor(endTimeEditor);
-		endTimeSpinner.setValue(new Date(60 * 60 * 1000));
-		timerSpin.add(endTimeSpinner);
-
-		startTimeSpinner.addChangeListener(new ChangeListener() {
-
+	
+		JPanel comboPanel = new JPanel(new GridLayout(0,2));
+		timePanel.add(comboPanel);
+		
+		DefaultComboBoxModel<String> startHourModel = new DefaultComboBoxModel<>();
+		for(int i=0; i<10; i++){
+			startHourModel.addElement("0"+i);
+		}
+		for(int i=10; i<24; i++){
+			startHourModel.addElement(""+i);
+		}
+		startHourCombo = new JComboBox<String>(startHourModel);
+		startHourCombo.addActionListener(new ActionListener() {
+			
 			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				Date startDate = (Date) startTimeSpinner.getValue();
-				Date endDate = (Date) endTimeSpinner.getValue();
-				Calendar calendar = GregorianCalendar.getInstance();
-				calendar.setTime(startDate);
-				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-				startTime += calendar.get(Calendar.MINUTE);
-				calendar.setTime(endDate);
-				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-				endTime += calendar.get(Calendar.MINUTE);
-
-				if (startTime > endTime) {
-					endTimeSpinner.setValue(startDate);
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour>endHour){
+					endHourCombo.setSelectedItem(startHourCombo.getSelectedItem());
+				}else if(startHour==endHour){
+					if(startMin>endMin){
+						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+					}
 				}
-
+				
 			}
 		});
-		endTimeSpinner.addChangeListener(new ChangeListener() {
-
+		comboPanel.add(startHourCombo);
+		DefaultComboBoxModel<String> startMimModel = new DefaultComboBoxModel<>();
+		startMimModel.addElement("00");
+		startMimModel.addElement("15");
+		startMimModel.addElement("30");
+		startMimModel.addElement("45");
+		startMinCombo = new JComboBox<String>(startMimModel);
+		startMinCombo.addActionListener(new ActionListener() {
+			
 			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				Date startDate = (Date) startTimeSpinner.getValue();
-				Date endDate = (Date) endTimeSpinner.getValue();
-				Calendar calendar = GregorianCalendar.getInstance();
-				calendar.setTime(startDate);
-				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-				startTime += calendar.get(Calendar.MINUTE);
-				calendar.setTime(endDate);
-				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-				endTime += calendar.get(Calendar.MINUTE);
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour==endHour){
 
-				if (startTime > endTime) {
-					startTimeSpinner.setValue(endDate);
+					if(startMin>endMin){
+						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+					}
 				}
-
+				
 			}
-
 		});
+		comboPanel.add(startMinCombo);
+		
+		DefaultComboBoxModel<String> endHourModel = new DefaultComboBoxModel<>();
+		for(int i=0; i<10; i++){
+			endHourModel.addElement("0"+i);
+		}
+		for(int i=10; i<24; i++){
+			endHourModel.addElement(""+i);
+		}
+		endHourCombo = new JComboBox<String>(endHourModel);
+		endHourCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour>endHour){
+					startHourCombo.setSelectedItem(endHourCombo.getSelectedItem());
+				}else if(startHour==endHour){
+					if(startMin>endMin){
+						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		comboPanel.add(endHourCombo);
+		
+		
+		DefaultComboBoxModel<String> endMimModel = new DefaultComboBoxModel<>();
+		endMimModel.addElement("00");
+		endMimModel.addElement("15");
+		endMimModel.addElement("30");
+		endMimModel.addElement("45");
+		endMinCombo = new JComboBox<String>(endMimModel);
+		endMinCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour==endHour){
+					if(startMin>endMin){
+						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		comboPanel.add(endMinCombo);
+		
+		
+		
+		
+//		JPanel timerSpin = new JPanel(new GridLayout(0, 1));
+//		timePanel.add(timerSpin);
+//
+//		startTimeSpinner = new JSpinner(new SpinnerDateModel());
+//		JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(
+//				startTimeSpinner, "HH:mm");
+//		startTimeSpinner.setEditor(startTimeEditor);
+//		startTimeSpinner.setValue(new Date(0));
+//
+//		timerSpin.add(startTimeSpinner);
+//		endTimeSpinner = new JSpinner(new SpinnerDateModel());
+//		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(
+//				endTimeSpinner, "HH:mm");
+//		endTimeSpinner.setEditor(endTimeEditor);
+//		endTimeSpinner.setValue(new Date(60 * 60 * 1000));
+//		timerSpin.add(endTimeSpinner);
+//
+//		startTimeSpinner.addChangeListener(new ChangeListener() {
+//
+//			@Override
+//			public void stateChanged(ChangeEvent arg0) {
+//				Date startDate = (Date) startTimeSpinner.getValue();
+//				Date endDate = (Date) endTimeSpinner.getValue();
+//				Calendar calendar = GregorianCalendar.getInstance();
+//				calendar.setTime(startDate);
+//				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+//				startTime += calendar.get(Calendar.MINUTE);
+//				calendar.setTime(endDate);
+//				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+//				endTime += calendar.get(Calendar.MINUTE);
+//
+//				if (startTime > endTime) {
+//					endTimeSpinner.setValue(startDate);
+//				}
+//
+//			}
+//		});
+//		endTimeSpinner.addChangeListener(new ChangeListener() {
+//
+//			@Override
+//			public void stateChanged(ChangeEvent arg0) {
+//				Date startDate = (Date) startTimeSpinner.getValue();
+//				Date endDate = (Date) endTimeSpinner.getValue();
+//				Calendar calendar = GregorianCalendar.getInstance();
+//				calendar.setTime(startDate);
+//				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+//				startTime += calendar.get(Calendar.MINUTE);
+//				calendar.setTime(endDate);
+//				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
+//				endTime += calendar.get(Calendar.MINUTE);
+//
+//				if (startTime > endTime) {
+//					startTimeSpinner.setValue(endDate);
+//				}
+//
+//			}
+//
+//		});
 
 		ButtonGroup bgRate = new ButtonGroup();
 		bgRate.add(full);
@@ -207,7 +332,7 @@ public class Scheduler extends JFrame implements ActionListener {
 
 		JPanel ratePanel = new JPanel();
 		container.add(ratePanel, BorderLayout.NORTH);
-		ratePanel.add(full);
+//		ratePanel.add(full);
 		ratePanel.add(half);
 		ratePanel.add(free);
 
@@ -274,13 +399,13 @@ public class Scheduler extends JFrame implements ActionListener {
 	}
 
 	private void createTableTabs() {
-		schecdPane = new JPanel[Globals.NUMSNOOKERTABLES][7];
-		lists = new JList[Globals.NUMSNOOKERTABLES][7];
-		listsSelection = new ListSelectionModel[Globals.NUMSNOOKERTABLES][7];
-		for (int i = 0; i < Globals.NUMSNOOKERTABLES; i++) {
+		schecdPane = new JPanel[10][7];
+		lists = new JList[10][7];
+		listsSelection = new ListSelectionModel[10][7];
+		for (int i = 0; i < 10; i++) {
 			JTabbedPane table = new JTabbedPane();
 			tablePanels.add(table);
-			tableTab.add("Table " + (i + 1), table);
+			tableTab.add("Table " + (i), table);
 		}
 		for (int i = 0; i < tablePanels.size(); i++) {
 			for (int j = 0; j < 7; j++) {
@@ -308,7 +433,7 @@ public class Scheduler extends JFrame implements ActionListener {
 				schecdPane[i][j].add(list);
 			}
 		}
-		for (int i = 0; i < Globals.NUMSNOOKERTABLES; i++) {
+		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 7; j++) {
 				tablePanels.get(i).add(Globals.getDayName(j), schecdPane[i][j]);
 			}
@@ -317,8 +442,8 @@ public class Scheduler extends JFrame implements ActionListener {
 	}
 
 	private void createTablesCheckboxes() {
-		for (int i = 0; i < Globals.NUMSNOOKERTABLES; i++) {
-			JCheckBox check = new JCheckBox("Table " + (i + 1));
+		for (int i = 0; i < 10; i++) {
+			JCheckBox check = new JCheckBox("Table " + (i));
 			tableCheckBoxList.add(check);
 			// check.setActionCommand("table"+(i+1));
 			// check.addActionListener(this);
@@ -362,20 +487,14 @@ public class Scheduler extends JFrame implements ActionListener {
 					} else {
 						rate = Globals.FREE;
 					}
-					Date startDate = (Date) startTimeSpinner.getValue();
-					Date endDate = (Date) endTimeSpinner.getValue();
-					Calendar calendar = GregorianCalendar.getInstance();
-					calendar.setTime(startDate);
-					startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-					startTime += calendar.get(Calendar.MINUTE);
-					calendar.setTime(endDate);
-					endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-					endTime += calendar.get(Calendar.MINUTE);
+					startTime = Integer.parseInt((String)startHourCombo.getSelectedItem())*60;
+					startTime += Integer.parseInt((String)startMinCombo.getSelectedItem());
+					endTime = Integer.parseInt((String)endHourCombo.getSelectedItem()) * 60;
+					endTime += Integer.parseInt((String)endMinCombo.getSelectedItem());
 
-					calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 					TimeSlot time = new TimeSlot(Globals.ID, startTime,
 							endTime, weekDays, rate, Globals.SNOOKER,
-							snookerTables.get(i));
+							tables.get(i));
 					if (checkOverlap(time)) {
 						timeSlots.add(time);
 						writeConfig();
@@ -434,12 +553,13 @@ public class Scheduler extends JFrame implements ActionListener {
 	private void removeEvent() {
 		int table = -1;
 		int day = -1;
-		for (int i = 0; i < Globals.NUMSNOOKERTABLES; i++) {
+		for (int i = 0; i < 10; i++) {
 
 			if (tablePanels.get(i).isVisible()) {
 				for (int j = 0; j < 7; j++) {
 					if (schecdPane[i][j].isVisible()) {
-						table = 0;
+						
+						table = i;
 						day = j;
 					}
 				}
@@ -451,11 +571,24 @@ public class Scheduler extends JFrame implements ActionListener {
 				for (int j = 0; j < timeSlots.size(); j++) {
 					if (dListModel[table][day].get(i).equals(
 							timeSlots.get(j).toString())) {
-						timeSlots.remove(j);
-						writeConfig();
+						timeSlots.get(j).getDayOfWeek()[day]=false;
+//						timeSlots.remove(j);
+						boolean tester=false;
+						for(int k=0; k<7; k++){
+							if(timeSlots.get(j).getDayOfWeek()[k]){
+								tester=true;
+							}
+						}
+							if(!tester){
+								timeSlots.remove(j);
+							}
+							writeConfig();
+						
 					}
 				}
 
+				
+				
 				dListModel[table][day].remove(selected[i]);
 			}
 			lists[table][day].setModel(dListModel[table][day]);
@@ -470,7 +603,7 @@ public class Scheduler extends JFrame implements ActionListener {
 				dListModel[i][k] = new DefaultListModel<String>();
 				for (int j = 0; j < timeSlots.size(); j++) {
 					if (timeSlots.get(j).getTable()
-							.equals(snookerTables.get(i))) {
+							.equals(tables.get(i))) {
 						if (timeSlots.get(j).getDayOfWeek()[k]) {
 							dListModel[i][k].addElement(timeSlots.get(j)
 									.toString());
@@ -506,10 +639,10 @@ public class Scheduler extends JFrame implements ActionListener {
 				}
 				int rate = Integer.parseInt(br.readLine());
 				int type = Integer.parseInt(br.readLine());
-				int tableNum = Integer.parseInt(br.readLine()) - 1;
+				int tableNum = Integer.parseInt(br.readLine());
 				br.readLine();
 				TimeSlot time = new TimeSlot(id, startT, endT, weekD, rate,
-						type, snookerTables.get(tableNum));
+						type, tables.get(tableNum));
 				timeSlots.add(time);
 				displayTimes();
 			}

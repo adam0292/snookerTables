@@ -211,7 +211,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 		priceButton.addActionListener(this);
 		reset.addActionListener(this);
 
-		changeBackground(new Color(220, 20, 60));
+		changeBackground(Globals.tableStopColor);
 
 	}
 
@@ -223,14 +223,14 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 	public void actionPerformed(ActionEvent e) {
 		if ("start".equals(e.getActionCommand()) && !running) {
 			createTimer();
-			changeBackground(new Color(33, 200, 50));
+			changeBackground(Globals.tableRunColor);
 			running = true;
 			start.setText("Stop");
 			start.setActionCommand("stop");
 		} else if ("stop".equals(e.getActionCommand())) {
 			stopTimer();
 			running = false;
-			changeBackground(new Color(237, 145, 33));
+			changeBackground(Globals.tablePauseColor);
 			start.setText("Resume");
 			start.setActionCommand("start");
 		} else if ("price".equals(e.getActionCommand())) {
@@ -261,7 +261,7 @@ public class Table extends JPanel implements ActionListener, MouseListener {
 				setPrice();
 				order.updatePrice();
 				stopWatch.reset();
-				changeBackground(new Color(220, 20, 60));
+				changeBackground(Globals.tableStopColor);
 				start.setText("Start");
 				start.setActionCommand("start");
 				changeRate.setText("Full");

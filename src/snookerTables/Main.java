@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.Calendar;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class Main extends JFrame implements ActionListener {
+public class Main extends JFrame implements ActionListener, WindowListener {
 
 	/**
 	 * 
@@ -31,7 +33,6 @@ public class Main extends JFrame implements ActionListener {
 	private JLabel clock;
 	private int detailShow;
 	private ArrayList<Table> snookerTableList, poolTableList;
-	private Color color;
 	private GridLayout detailGridLay;
 	private final int DETAILWIDTH = 3;
 
@@ -47,16 +48,16 @@ public class Main extends JFrame implements ActionListener {
 
 		// Set title
 		setTitle("Snooker Club");
-		// Define the main background color
-		color = Color.DARK_GRAY;
 		// Make the frame visible
 		this.setVisible(true);
 		// Set default close action
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		//add window listener
+		this.addWindowListener(this);
 		// Set the layout
 		this.setLayout(new BorderLayout());
 		// Set the color
-		this.getContentPane().setBackground(color);
+		this.getContentPane().setBackground(Globals.mainBackgroundColor);
 		// Set the look and feel
 		try {
 			UIManager
@@ -67,7 +68,7 @@ public class Main extends JFrame implements ActionListener {
 
 		// Create main pane for frame and set color
 		container = new JPanel(new BorderLayout());
-		container.setBackground(color);
+		container.setBackground(Globals.mainBackgroundColor);
 		// Initialise the top panel
 		JPanel topPanel = new JPanel(new BorderLayout());
 
@@ -96,7 +97,7 @@ public class Main extends JFrame implements ActionListener {
 		// add the topBar to the topPanel
 		topPanel.add(topBar, BorderLayout.CENTER);
 		// Set the color of the topBar
-		topBar.setBackground(color);
+		topBar.setBackground(Globals.mainBackgroundColor);
 
 		// //Create a title label for the frame
 		// JLabel name = new JLabel("Snooker Club", JLabel.CENTER);
@@ -121,7 +122,7 @@ public class Main extends JFrame implements ActionListener {
 
 		// Create the scrollPane, set the color and border
 		scroll = new JScrollPane(container);
-		scroll.setBackground(color);
+		scroll.setBackground(Globals.mainBackgroundColor);
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		// Add the scrollPane to the frame
 		this.add(scroll, BorderLayout.CENTER);
@@ -129,19 +130,19 @@ public class Main extends JFrame implements ActionListener {
 		// Create the snookerTables panel and set border and color
 		snookerTables = new JPanel(new GridLayout(3, 3, 2, 2));
 		snookerTables.setBorder(new EmptyBorder(6, 6, 6, 6));
-		snookerTables.setBackground(color);
+		snookerTables.setBackground(Globals.mainBackgroundColor);
 		// Create the poolTables panel and set border and color
 		poolTables = new JPanel();
 		poolTables.setBorder(new EmptyBorder(6, 6, 6, 6));
-		poolTables.setBackground(color);
+		poolTables.setBackground(Globals.mainBackgroundColor);
 
 		// Create the holder panels fpr the snooker and pool tables and set
 		// color
 		snookerHolder = new JPanel();
-		snookerHolder.setBackground(color);
+		snookerHolder.setBackground(Globals.mainBackgroundColor);
 		snookerHolder.add(snookerTables);
 		poolHolder = new JPanel();
-		poolHolder.setBackground(color);
+		poolHolder.setBackground(Globals.mainBackgroundColor);
 		poolHolder.add(poolTables);
 
 		// Create the tabbed pane and add the snooker and pool holders
@@ -151,7 +152,7 @@ public class Main extends JFrame implements ActionListener {
 
 		// Create the central pane and set color
 		JPanel central = new JPanel();
-		central.setBackground(color);
+		central.setBackground(Globals.mainBackgroundColor);
 		// add the tabbed pain to it
 		central.add(tabbed);
 		// add the tabbed pain to the central panel
@@ -159,7 +160,7 @@ public class Main extends JFrame implements ActionListener {
 
 		// Create a panel for the right center and set color
 		rightCenter = new JPanel();
-		rightCenter.setBackground(color);
+		rightCenter.setBackground(Globals.mainBackgroundColor);
 		// add the pain to the container
 		container.add(rightCenter, BorderLayout.EAST);
 
@@ -182,7 +183,7 @@ public class Main extends JFrame implements ActionListener {
 		detailGridLay = new GridLayout(0, 1, 4, 4);
 		// create the detailPane with gridLayout, set color
 		detailPanel = new JPanel(new GridLayout(0, 1, 4, 4));
-		detailPanel.setBackground(color);
+		detailPanel.setBackground(Globals.mainBackgroundColor);
 		// add to rightCenter
 		rightCenter.add(detailPanel);
 
@@ -355,4 +356,51 @@ public class Main extends JFrame implements ActionListener {
 		}
 
 	}
-}
+	
+	public void exit(){
+		if(JOptionPane.showConfirmDialog(this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+			System.exit(0);
+		}
+	}
+		
+		public void windowClosing(WindowEvent e){ 
+                exit(); 
+        }
+
+		@Override
+		public void windowActivated(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowClosed(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowIconified(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowOpened(WindowEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+

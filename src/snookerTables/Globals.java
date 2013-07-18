@@ -1,5 +1,7 @@
 package snookerTables;
 
+import java.awt.Color;
+
 public class Globals {
 
 	static final int SNOOKER = 0;
@@ -14,6 +16,11 @@ public class Globals {
 	
 	static int ID = 0;
 	
+	static final Color mainBackgroundColor = Color.DARK_GRAY;
+	static final Color tableStopColor = new Color(220, 20, 60);
+	static final Color tablePauseColor = new Color(237, 145, 33);
+	static final Color tableRunColor = new Color(33, 200, 50);
+	
 	public static String getRate(int rateIndex){
 		if(rateIndex==0){
 			return "Full";
@@ -21,7 +28,7 @@ public class Globals {
 		if(rateIndex==1){
 			return "Half";
 		}
-		if(rateIndex==0){
+		if(rateIndex==2){
 			return "Free";
 		}
 		return"";

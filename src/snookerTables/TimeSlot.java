@@ -98,7 +98,7 @@ public class TimeSlot {
 		}else{
 			endTime = ""+endHour;
 		}
-		if(startMinute<10){
+		if(endMinute<10){
 			endTime = endTime.concat(":0"+endMinute);
 		}else{
 			endTime = endTime.concat(":"+endMinute);
