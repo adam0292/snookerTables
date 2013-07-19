@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -73,6 +74,7 @@ public class Scheduler extends JFrame implements ActionListener {
 	private BufferedReader br;
 	private File file;
 	private JComboBox<String> startMinCombo, startHourCombo, endMinCombo, endHourCombo;
+	private JPanel rateBar, weekDays, comboPanel, addFrameContainer;
 
 	public Scheduler(ArrayList<Table> snookerTables, ArrayList<Table> poolTables) {
 		this.setVisible(true);
@@ -81,7 +83,7 @@ public class Scheduler extends JFrame implements ActionListener {
 		container = new JPanel(new BorderLayout());
 		this.add(container);
 		tableCheckBoxList = new ArrayList<JCheckBox>();
-		weekDayCheckBoxList = new ArrayList<JCheckBox>();
+		
 		tablePanels = new ArrayList<JTabbedPane>();
 		timeSlots = new ArrayList<TimeSlot>();
 		dListModel = new DefaultListModel[10][7];
@@ -92,11 +94,9 @@ public class Scheduler extends JFrame implements ActionListener {
 		}
 		main = new JPanel(new BorderLayout());
 
-		JPanel checkboxes = new JPanel(new GridLayout(0, 1));
-		main.add(checkboxes, BorderLayout.CENTER);
-		JPanel outermain = new JPanel(new GridLayout(0, 1));
-		outermain.add(main);
-		container.add(outermain, BorderLayout.CENTER);
+//		JPanel checkboxes = new JPanel(new GridLayout(0, 1));
+//		main.add(checkboxes, BorderLayout.CENTER);
+		container.add(main, BorderLayout.CENTER);
 		JButton add = new JButton("Add");
 		add.setActionCommand("add");
 		add.addActionListener(this);
@@ -111,234 +111,160 @@ public class Scheduler extends JFrame implements ActionListener {
 
 		JPanel bottom = new JPanel();
 		container.add(bottom, BorderLayout.SOUTH);
-		tableChecks = new JPanel(new GridLayout(3, 0));
-		createTablesCheckboxes();
-		checkboxes.add(tableChecks, BorderLayout.CENTER);
-		// list = new JList<String>();
-		// list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		// ListSelectionModel selectionModel = list.getSelectionModel();
-		// selectionModel.addListSelectionListener(new ListSelectionListener() {
-		//
-		// @Override
-		// public void valueChanged(ListSelectionEvent e) {
-		// ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-		// }
-		// });
-		// // list.setLayoutOrientation(JList.VERTICAL_WRAP);
-		// list.setVisibleRowCount(-1);
-		// bottom.add(list);
+		
+//		createTablesCheckboxes();
+//		checkboxes.add(tableChecks, BorderLayout.CENTER);
+		
+//		full = new JRadioButton("Full");
+//		half = new JRadioButton("Half", true);
+//		free = new JRadioButton("Free");
+//		JPanel timePanel = new JPanel();
+//		container.add(timePanel, BorderLayout.EAST);
 
-		full = new JRadioButton("Full");
-		half = new JRadioButton("Half", true);
-		free = new JRadioButton("Free");
-		JPanel timePanel = new JPanel();
-		container.add(timePanel, BorderLayout.EAST);
-
-		JCheckBox monday = new JCheckBox("Monday");
-		JCheckBox tuesday = new JCheckBox("Tuesday");
-		JCheckBox wednesday = new JCheckBox("Wednesday");
-		JCheckBox thursday = new JCheckBox("Thursday");
-		JCheckBox friday = new JCheckBox("Friday");
-		JCheckBox saturday = new JCheckBox("Saturday");
-		JCheckBox sunday = new JCheckBox("Sunday");
-		weekDayCheckBoxList.add(sunday);
-		weekDayCheckBoxList.add(monday);
-		weekDayCheckBoxList.add(tuesday);
-		weekDayCheckBoxList.add(wednesday);
-		weekDayCheckBoxList.add(thursday);
-		weekDayCheckBoxList.add(friday);
-		weekDayCheckBoxList.add(saturday);
-		JPanel weekPanel = new JPanel(new GridLayout(0, 3));
-		for (int i = 0; i < weekDayCheckBoxList.size(); i++) {
-			weekPanel.add(weekDayCheckBoxList.get(i));
-		}
-		checkboxes.add(weekPanel, BorderLayout.SOUTH);
+//		JCheckBox monday = new JCheckBox("Monday");
+//		JCheckBox tuesday = new JCheckBox("Tuesday");
+//		JCheckBox wednesday = new JCheckBox("Wednesday");
+//		JCheckBox thursday = new JCheckBox("Thursday");
+//		JCheckBox friday = new JCheckBox("Friday");
+//		JCheckBox saturday = new JCheckBox("Saturday");
+//		JCheckBox sunday = new JCheckBox("Sunday");
+//		weekDayCheckBoxList.add(sunday);
+//		weekDayCheckBoxList.add(monday);
+//		weekDayCheckBoxList.add(tuesday);
+//		weekDayCheckBoxList.add(wednesday);
+//		weekDayCheckBoxList.add(thursday);
+//		weekDayCheckBoxList.add(friday);
+//		weekDayCheckBoxList.add(saturday);
+//		JPanel weekPanel = new JPanel(new GridLayout(0, 3));
+//		for (int i = 0; i < weekDayCheckBoxList.size(); i++) {
+//			weekPanel.add(weekDayCheckBoxList.get(i));
+//		}
+//		checkboxes.add(weekPanel, BorderLayout.SOUTH);
 
 	
-		JPanel comboPanel = new JPanel(new GridLayout(0,2));
-		timePanel.add(comboPanel);
+//		JPanel comboPanel = new JPanel(new GridLayout(0,2));
+//		timePanel.add(comboPanel);
 		
-		DefaultComboBoxModel<String> startHourModel = new DefaultComboBoxModel<>();
-		for(int i=0; i<10; i++){
-			startHourModel.addElement("0"+i);
-		}
-		for(int i=10; i<24; i++){
-			startHourModel.addElement(""+i);
-		}
-		startHourCombo = new JComboBox<String>(startHourModel);
-		startHourCombo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
-				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
-				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
-				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
-				if(startHour>endHour){
-					endHourCombo.setSelectedItem(startHourCombo.getSelectedItem());
-				}else if(startHour==endHour){
-					if(startMin>endMin){
-						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
-					}
-				}
-				
-			}
-		});
-		comboPanel.add(startHourCombo);
-		DefaultComboBoxModel<String> startMimModel = new DefaultComboBoxModel<>();
-		startMimModel.addElement("00");
-		startMimModel.addElement("15");
-		startMimModel.addElement("30");
-		startMimModel.addElement("45");
-		startMinCombo = new JComboBox<String>(startMimModel);
-		startMinCombo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
-				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
-				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
-				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
-				if(startHour==endHour){
-
-					if(startMin>endMin){
-						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
-					}
-				}
-				
-			}
-		});
-		comboPanel.add(startMinCombo);
-		
-		DefaultComboBoxModel<String> endHourModel = new DefaultComboBoxModel<>();
-		for(int i=0; i<10; i++){
-			endHourModel.addElement("0"+i);
-		}
-		for(int i=10; i<24; i++){
-			endHourModel.addElement(""+i);
-		}
-		endHourCombo = new JComboBox<String>(endHourModel);
-		endHourCombo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
-				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
-				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
-				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
-				if(startHour>endHour){
-					startHourCombo.setSelectedItem(endHourCombo.getSelectedItem());
-				}else if(startHour==endHour){
-					if(startMin>endMin){
-						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
-					}
-				}
-				
-			}
-		});
-		comboPanel.add(endHourCombo);
-		
-		
-		DefaultComboBoxModel<String> endMimModel = new DefaultComboBoxModel<>();
-		endMimModel.addElement("00");
-		endMimModel.addElement("15");
-		endMimModel.addElement("30");
-		endMimModel.addElement("45");
-		endMinCombo = new JComboBox<String>(endMimModel);
-		endMinCombo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
-				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
-				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
-				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
-				if(startHour==endHour){
-					if(startMin>endMin){
-						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
-					}
-				}
-				
-			}
-		});
-		comboPanel.add(endMinCombo);
-		
-		
-		
-		
-//		JPanel timerSpin = new JPanel(new GridLayout(0, 1));
-//		timePanel.add(timerSpin);
-//
-//		startTimeSpinner = new JSpinner(new SpinnerDateModel());
-//		JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(
-//				startTimeSpinner, "HH:mm");
-//		startTimeSpinner.setEditor(startTimeEditor);
-//		startTimeSpinner.setValue(new Date(0));
-//
-//		timerSpin.add(startTimeSpinner);
-//		endTimeSpinner = new JSpinner(new SpinnerDateModel());
-//		JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(
-//				endTimeSpinner, "HH:mm");
-//		endTimeSpinner.setEditor(endTimeEditor);
-//		endTimeSpinner.setValue(new Date(60 * 60 * 1000));
-//		timerSpin.add(endTimeSpinner);
-//
-//		startTimeSpinner.addChangeListener(new ChangeListener() {
-//
+//		DefaultComboBoxModel<String> startHourModel = new DefaultComboBoxModel<>();
+//		for(int i=0; i<10; i++){
+//			startHourModel.addElement("0"+i);
+//		}
+//		for(int i=10; i<24; i++){
+//			startHourModel.addElement(""+i);
+//		}
+//		startHourCombo = new JComboBox<String>(startHourModel);
+//		startHourCombo.addActionListener(new ActionListener() {
+//			
 //			@Override
-//			public void stateChanged(ChangeEvent arg0) {
-//				Date startDate = (Date) startTimeSpinner.getValue();
-//				Date endDate = (Date) endTimeSpinner.getValue();
-//				Calendar calendar = GregorianCalendar.getInstance();
-//				calendar.setTime(startDate);
-//				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-//				startTime += calendar.get(Calendar.MINUTE);
-//				calendar.setTime(endDate);
-//				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-//				endTime += calendar.get(Calendar.MINUTE);
-//
-//				if (startTime > endTime) {
-//					endTimeSpinner.setValue(startDate);
+//			public void actionPerformed(ActionEvent arg0) {
+//				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+//				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+//				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+//				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+//				if(startHour>endHour){
+//					endHourCombo.setSelectedItem(startHourCombo.getSelectedItem());
+//				}else if(startHour==endHour){
+//					if(startMin>endMin){
+//						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+//					}
 //				}
-//
+//				
 //			}
 //		});
-//		endTimeSpinner.addChangeListener(new ChangeListener() {
-//
+//		comboPanel.add(startHourCombo);
+//		DefaultComboBoxModel<String> startMimModel = new DefaultComboBoxModel<>();
+//		startMimModel.addElement("00");
+//		startMimModel.addElement("15");
+//		startMimModel.addElement("30");
+//		startMimModel.addElement("45");
+//		startMinCombo = new JComboBox<String>(startMimModel);
+//		startMinCombo.addActionListener(new ActionListener() {
+//			
 //			@Override
-//			public void stateChanged(ChangeEvent arg0) {
-//				Date startDate = (Date) startTimeSpinner.getValue();
-//				Date endDate = (Date) endTimeSpinner.getValue();
-//				Calendar calendar = GregorianCalendar.getInstance();
-//				calendar.setTime(startDate);
-//				startTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-//				startTime += calendar.get(Calendar.MINUTE);
-//				calendar.setTime(endDate);
-//				endTime = calendar.get(Calendar.HOUR_OF_DAY) * 60;
-//				endTime += calendar.get(Calendar.MINUTE);
+//			public void actionPerformed(ActionEvent arg0) {
+//				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+//				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+//				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+//				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+//				if(startHour==endHour){
 //
-//				if (startTime > endTime) {
-//					startTimeSpinner.setValue(endDate);
+//					if(startMin>endMin){
+//						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+//					}
 //				}
-//
+//				
 //			}
-//
 //		});
+//		comboPanel.add(startMinCombo);
+//		
+//		DefaultComboBoxModel<String> endHourModel = new DefaultComboBoxModel<>();
+//		for(int i=0; i<10; i++){
+//			endHourModel.addElement("0"+i);
+//		}
+//		for(int i=10; i<24; i++){
+//			endHourModel.addElement(""+i);
+//		}
+//		endHourCombo = new JComboBox<String>(endHourModel);
+//		endHourCombo.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+//				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+//				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+//				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+//				if(startHour>endHour){
+//					startHourCombo.setSelectedItem(endHourCombo.getSelectedItem());
+//				}else if(startHour==endHour){
+//					if(startMin>endMin){
+//						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+//					}
+//				}
+//				
+//			}
+//		});
+//		comboPanel.add(endHourCombo);
+//		
+//		
+//		DefaultComboBoxModel<String> endMimModel = new DefaultComboBoxModel<>();
+//		endMimModel.addElement("00");
+//		endMimModel.addElement("15");
+//		endMimModel.addElement("30");
+//		endMimModel.addElement("45");
+//		endMinCombo = new JComboBox<String>(endMimModel);
+//		endMinCombo.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+//				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+//				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+//				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+//				if(startHour==endHour){
+//					if(startMin>endMin){
+//						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+//					}
+//				}
+//				
+//			}
+//		});
+//		comboPanel.add(endMinCombo);
 
-		ButtonGroup bgRate = new ButtonGroup();
-		bgRate.add(full);
-		bgRate.add(half);
-		bgRate.add(free);
 
-		JPanel ratePanel = new JPanel();
-		container.add(ratePanel, BorderLayout.NORTH);
+//		ButtonGroup bgRate = new ButtonGroup();
+//		bgRate.add(full);
+//		bgRate.add(half);
+//		bgRate.add(free);
+
+//		JPanel ratePanel = new JPanel();
+//		container.add(ratePanel, BorderLayout.NORTH);
 //		ratePanel.add(full);
-		ratePanel.add(half);
-		ratePanel.add(free);
+//		ratePanel.add(half);
+//		ratePanel.add(free);
 
 		tableTab = new JTabbedPane();
 		createTableTabs();
-		outermain.add(tableTab);
+		main.add(tableTab, BorderLayout.CENTER);
 
 		CheckScheduler checker = new CheckScheduler(this);
 		new Thread(checker).start();
@@ -361,7 +287,7 @@ public class Scheduler extends JFrame implements ActionListener {
 
 		}
 
-
+		addEventFrame();
 		validate();
 	}
 
@@ -442,6 +368,7 @@ public class Scheduler extends JFrame implements ActionListener {
 	}
 
 	private void createTablesCheckboxes() {
+		tableChecks = new JPanel(new GridLayout(3, 0));
 		for (int i = 0; i < 10; i++) {
 			JCheckBox check = new JCheckBox("Table " + (i));
 			tableCheckBoxList.add(check);
@@ -515,6 +442,161 @@ public class Scheduler extends JFrame implements ActionListener {
 		if (!tableSelected) {
 			JOptionPane.showMessageDialog(this, "Choose at least one table");
 		}
+	}
+	
+	private void addEventFrame(){
+		JFrame addFrame = new JFrame();
+		addFrame.setVisible(true);
+		addFrameContainer = new JPanel(new BorderLayout());
+		addFrame.add(addFrameContainer);
+		
+		rateBar = new JPanel();
+		addFrameContainer.add(rateBar, BorderLayout.CENTER);
+		full = new JRadioButton("Full");
+		half = new JRadioButton("Half", true);
+		free = new JRadioButton("Free");
+//		rateBar.add(full);
+		rateBar.add(half);
+		rateBar.add(free);
+		ButtonGroup bgRate = new ButtonGroup();
+		bgRate.add(full);
+		bgRate.add(half);
+		bgRate.add(free);
+		
+		createTablesCheckboxes();
+//		container.add(tableChecks, BorderLayout.CENTER);
+		
+		weekDayCheckBoxList = new ArrayList<JCheckBox>();
+		JCheckBox monday = new JCheckBox("Monday");
+		JCheckBox tuesday = new JCheckBox("Tuesday");
+		JCheckBox wednesday = new JCheckBox("Wednesday");
+		JCheckBox thursday = new JCheckBox("Thursday");
+		JCheckBox friday = new JCheckBox("Friday");
+		JCheckBox saturday = new JCheckBox("Saturday");
+		JCheckBox sunday = new JCheckBox("Sunday");
+		weekDayCheckBoxList.add(sunday);
+		weekDayCheckBoxList.add(monday);
+		weekDayCheckBoxList.add(tuesday);
+		weekDayCheckBoxList.add(wednesday);
+		weekDayCheckBoxList.add(thursday);
+		weekDayCheckBoxList.add(friday);
+		weekDayCheckBoxList.add(saturday);
+		weekDays = new JPanel();
+		for(int i=0; i<weekDayCheckBoxList.size(); i++){
+			weekDays.add(weekDayCheckBoxList.get(i));
+		}
+//		container.add(weekDays, BorderLayout.CENTER);
+		
+		comboPanel = new JPanel(new GridLayout(2,3));
+		DefaultComboBoxModel<String> startHourModel = new DefaultComboBoxModel<>();
+		for(int i=0; i<10; i++){
+			startHourModel.addElement("0"+i);
+		}
+		for(int i=10; i<24; i++){
+			startHourModel.addElement(""+i);
+		}
+		startHourCombo = new JComboBox<String>(startHourModel);
+		startHourCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour>endHour){
+					endHourCombo.setSelectedItem(startHourCombo.getSelectedItem());
+				}else if(startHour==endHour){
+					if(startMin>endMin){
+						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		JLabel startTimeLabel = new JLabel("Start Time:");
+		comboPanel.add(startTimeLabel);
+		comboPanel.add(startHourCombo);
+		DefaultComboBoxModel<String> startMimModel = new DefaultComboBoxModel<>();
+		startMimModel.addElement("00");
+		startMimModel.addElement("15");
+		startMimModel.addElement("30");
+		startMimModel.addElement("45");
+		startMinCombo = new JComboBox<String>(startMimModel);
+		startMinCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour==endHour){
+
+					if(startMin>endMin){
+						endMinCombo.setSelectedItem(startMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		comboPanel.add(startMinCombo);
+		
+		DefaultComboBoxModel<String> endHourModel = new DefaultComboBoxModel<>();
+		for(int i=0; i<10; i++){
+			endHourModel.addElement("0"+i);
+		}
+		for(int i=10; i<24; i++){
+			endHourModel.addElement(""+i);
+		}
+		endHourCombo = new JComboBox<String>(endHourModel);
+		endHourCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour>endHour){
+					startHourCombo.setSelectedItem(endHourCombo.getSelectedItem());
+				}else if(startHour==endHour){
+					if(startMin>endMin){
+						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		JLabel endHourLabel = new JLabel("End Time:");
+		comboPanel.add(endHourLabel);
+		comboPanel.add(endHourCombo);
+		
+		DefaultComboBoxModel<String> endMimModel = new DefaultComboBoxModel<>();
+		endMimModel.addElement("00");
+		endMimModel.addElement("15");
+		endMimModel.addElement("30");
+		endMimModel.addElement("45");
+		endMinCombo = new JComboBox<String>(endMimModel);
+		endMinCombo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int startHour = Integer.parseInt((String)startHourCombo.getSelectedItem());
+				int endHour = Integer.parseInt((String)endHourCombo.getSelectedItem());
+				int startMin = Integer.parseInt((String)startMinCombo.getSelectedItem());
+				int endMin = Integer.parseInt((String)endMinCombo.getSelectedItem());
+				if(startHour==endHour){
+					if(startMin>endMin){
+						startMinCombo.setSelectedItem(endMinCombo.getSelectedItem());
+					}
+				}
+				
+			}
+		});
+		comboPanel.add(endMinCombo);
+		
+		addFrame.pack();
 	}
 
 	private void writeConfig() {
